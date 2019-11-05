@@ -76,7 +76,7 @@ ENU2RPY = ENU2RPY3*ENU2RPY2*ENU2RPY1; %rotation matrix
 %% pinhole camera model
 POINT_RPY = ENU2RPY*(PointZ-myX); %true point coordinates in RPY frame
 FramePoint(1:2,1) = Point_estim.camera.Cam_F/POINT_RPY(3)*[POINT_RPY(1); POINT_RPY(2)]; % true frame coordinates
-Y = FramePoint + randn(2,1)*Point_estim.filter.sko_Frame_Meas; % measurements - frame coordinates with noise
+Y = FramePoint + randn(2,1)*Point_estim.filter.sko_Frame_Meas*0; % measurements - frame coordinates with noise
 
 %% ENU2RPY with error
 %% 1. Постоянная ошибка для всех углов
@@ -89,7 +89,7 @@ Y = FramePoint + randn(2,1)*Point_estim.filter.sko_Frame_Meas; % measurements - 
 %% 2. Растущая ошибка с количеством измерений для всех углов
 
 T_error=30;
-Ufi_error_deg = k*(1/N_MODEL);      %к концу времени наблюдеия добавится 1 градус ошибки
+Ufi_error_deg = k*0.1;
 Ufi_error = deg2rad(Ufi_error_deg);
 fi_error = Ufi_error*sin(tt*(2*pi/T_error));
 
