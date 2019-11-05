@@ -1,4 +1,4 @@
-function [error,MODEL_TIME_SEC,F_frame,T,N_MODEL] = Basic()
+%function [error,MODEL_TIME_SEC,F_frame,T,N_MODEL] = Basic()
 %%%%
 % point coordinates estimation
 % we know our ENU coordinates
@@ -20,7 +20,7 @@ N_MODEL = ceil(MODEL_TIME_SEC/T);   %number of observations
 
 sko_Coordinate_Meas = 0.05;         % RTK solution
 wVu = 0.5;              %radial frequency
-Vku = 2;                %max velocity
+Vku = 1;                %max velocity
 PointZ = [0;1;5];       %true point coordinates in ENU frame
 ENU2RPY = eye(3);       %rotation matrix RPY to ENU
 RPY2ENU = ENU2RPY';     %rotation matrix ENU to RPY
@@ -76,12 +76,12 @@ ENU2RPY = ENU2RPY3*ENU2RPY2*ENU2RPY1; %rotation matrix
 %% pinhole camera model
 POINT_RPY = ENU2RPY*(PointZ-myX); %true point coordinates in RPY frame
 FramePoint(1:2,1) = Point_estim.camera.Cam_F/POINT_RPY(3)*[POINT_RPY(1); POINT_RPY(2)]; % true frame coordinates
-Y = FramePoint + randn(2,1)*Point_estim.filter.sko_Frame_Meas*0; % measurements - frame coordinates with noise
+Y = FramePoint + randn(2,1)*Point_estim.filter.sko_Frame_Meas; % measurements - frame coordinates with noise
 
 %% ENU2RPY with error
 
 T_error=30;
-Ufi_error_deg = 0.1;
+Ufi_error_deg = 0;
 Ufi_error = deg2rad(Ufi_error_deg);
 fi_error = Ufi_error*sin(tt*(2*pi/T_error));
 
@@ -149,7 +149,7 @@ xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 %}
 %%
-%{
+
 t=1:k;          %all observations
 l=t/F_frame; 
 
@@ -161,7 +161,7 @@ ylabel('Ошибка оценивания,м')
 grid on
 title('Зависимость ошибки оценивания координат особой точки от времени')
 ylim([error_min-1 error_max+1])
-%}
+
 %{
 figure
 plot(l,xoc_mas)
