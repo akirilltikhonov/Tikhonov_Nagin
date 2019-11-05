@@ -30,7 +30,7 @@ xlabel('Время,с')
 ylabel('Ошибка оценивания,м')
 grid on
 title('Зависимость ошибки оценивания координат особой точки от времени')
-ylim([min(error_Y(:))-1 max(error_Y(:))+1])
+ylim([min(error_X(:))-1 max(error_X(:))+1])
 
 
 %% Y coordinate
@@ -41,7 +41,7 @@ xlabel('Время,с')
 ylabel('Ошибка оценивания,м')
 grid on
 title('Зависимость ошибки оценивания координат особой точки от времени')
-ylim([-4 4])
+ylim([min(error_Y(:))-1 max(error_Y(:))+1])
 
 %% Z coordinate
 figure
