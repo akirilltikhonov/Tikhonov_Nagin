@@ -59,7 +59,7 @@ Ufi1deg = 0;
 Ufi1 = deg2rad(Ufi1deg);      %amplitude of turn relative to X
 fi1 = Ufi1*sin(tt*(2*pi/Tturn));    %angle of turn
 
-Ufi2deg = 60;
+Ufi2deg = 0;
 Ufi2 = deg2rad(Ufi2deg);            %amplitude of turn relative to Y
 fi2 = Ufi2*sin(tt*(2*pi/Tturn));    %angle of turn
 
@@ -133,26 +133,16 @@ error_min = min(error(:));  %min error value
 end
 
 %% Trajectory point on the screen
-%{
-figure
-comet(Frame_Point_mas(1,:), Frame_Point_mas(2,:));
-xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
-ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
-
-
 
 % figure
 % comet(Frame_Point_mas(1,:), Frame_Point_mas(2,:));
 % xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 % ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 
-
 figure
 plot(Frame_Point_mas(1,:), Frame_Point_mas(2,:), '*');
 xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
-
-%}
 
 
 
@@ -170,19 +160,19 @@ grid on
 title('«ависимость ошибки оценивани€ координат особой точки от времени')
 ylim([error_min-1 error_max+1])
 
-%{
-figure
-plot(l,xoc_mas)
-legend ('x1','x2','x3')
-xlabel('¬рем€,с')
-ylabel('координаты особой точки,м')
-grid on
-title('зависимость изменени€ координат особой точки от времени')
-%}
-%{
-figure; plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:) ); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); grid on
-xlabel('X1')
-ylabel('X2')
-zlabel('X3')
-%}
+
+% figure
+% plot(l,xoc_mas)
+% legend ('x1','x2','x3')
+% xlabel('¬рем€,с')
+% ylabel('координаты особой точки,м')
+% grid on
+% title('зависимость изменени€ координат особой точки от времени')
+
+
+% figure; plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:) ); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); grid on
+% xlabel('X1')
+% ylabel('X2')
+% zlabel('X3')
+
 
