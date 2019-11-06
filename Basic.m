@@ -59,7 +59,7 @@ Ufi1deg = 0;
 Ufi1 = deg2rad(Ufi1deg);      %amplitude of turn relative to X
 fi1 = Ufi1*sin(tt*(2*pi/Tturn));    %angle of turn
 
-Ufi2deg = 60;
+Ufi2deg = 0;
 Ufi2 = deg2rad(Ufi2deg);            %amplitude of turn relative to Y
 fi2 = Ufi2*sin(tt*(2*pi/Tturn));    %angle of turn
 
@@ -82,7 +82,7 @@ Y = FramePoint + randn(2,1)*Point_estim.filter.sko_Frame_Meas; % measurements - 
 %% 1. Постоянная ошибка для всех углов
 
 % T_error=30;
-% Ufi_error_deg = 0.1;
+% Ufi_error_deg = 0.5;
 % Ufi_error = deg2rad(Ufi_error_deg);
 % fi_error = Ufi_error*sin(tt*(2*pi/T_error));
 
@@ -93,7 +93,7 @@ Ufi_error_deg = k*(1/N_MODEL);      %к концу времени наблюдеия добавится 1 граду
 Ufi_error = deg2rad(Ufi_error_deg);
 fi_error = Ufi_error*sin(tt*(2*pi/T_error));
 
-
+%%
 fi1_with_error = Ufi1*sin(tt*(2*pi/Tturn)) + fi_error;
 fi2_with_error = Ufi2*sin(tt*(2*pi/Tturn)) + fi_error;
 fi3_with_error = Ufi3*sin(tt*(2*pi/Tturn)) + fi_error;
@@ -139,10 +139,6 @@ error(:,k)=Point_estim.filter.xoc-PointZ;
 error_max = max(error(:));  %max error value
 error_min = min(error(:));  %min error value
 
-%number=240;
-%error_mean = [ mean(error(1, [number:k])); mean(error(2, [number:k])); mean(error(3, [number:k]))];
-%error_std = [ std(error(1, [number:k])); std(error(2, [number:k])); std(error(3, [number:k]))];
-
 end
 
 %% Trajectory point on the screen
@@ -152,24 +148,24 @@ end
 % xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 % ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 
-figure
-plot(Frame_Point_mas(1,:), Frame_Point_mas(2,:), '*');
-xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
-ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+% figure
+% plot(Frame_Point_mas(1,:), Frame_Point_mas(2,:), '*');
+% xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+% ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 
 %%
 
 t=1:k;          %all observations
 l=t/F_frame; 
 
-figure
-plot(l,error)
-legend ('Ошибка по координате x1','Ошибка по координате x2','Ошибка по координате x3')
-xlabel('Время,с')
-ylabel('Ошибка оценивания,м')
-grid on
-title('Зависимость ошибки оценивания координат особой точки от времени')
-ylim([error_min-1 error_max+1])
+% figure
+% plot(l,error)
+% legend ('Ошибка по координате x1','Ошибка по координате x2','Ошибка по координате x3')
+% xlabel('Время,с')
+% ylabel('Ошибка оценивания,м')
+% grid on
+% title('Зависимость ошибки оценивания координат особой точки от времени')
+% ylim([error_min-1 error_max+1])
 
 %{
 figure
