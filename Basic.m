@@ -130,10 +130,6 @@ error(:,k)=Point_estim.filter.xoc-PointZ;
 error_max = max(error(:));  %max error value
 error_min = min(error(:));  %min error value
 
-%number=240;
-%error_mean = [ mean(error(1, [number:k])); mean(error(2, [number:k])); mean(error(3, [number:k]))];
-%error_std = [ std(error(1, [number:k])); std(error(2, [number:k])); std(error(3, [number:k]))];
-
 end
 
 %% Trajectory point on the screen
@@ -143,11 +139,23 @@ comet(Frame_Point_mas(1,:), Frame_Point_mas(2,:));
 xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 
+
+
+% figure
+% comet(Frame_Point_mas(1,:), Frame_Point_mas(2,:));
+% xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+% ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+
+
 figure
 plot(Frame_Point_mas(1,:), Frame_Point_mas(2,:), '*');
 xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+
 %}
+
+
+
 %%
 
 t=1:k;          %all observations
