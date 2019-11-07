@@ -4,7 +4,7 @@ clc
 
 amount = 10;     %Number of runs. Minimum 2
 for i = 1:1:amount
-[error,MODEL_TIME_SEC,F_frame,T,N_MODEL] = Basic()
+[error,MODEL_TIME_SEC,F_frame,T,N_MODEL,seed(i,1)] = Basic();
 
 error_XYZ(3*i-2:3*i, 1:N_MODEL) = error;
 
@@ -130,30 +130,30 @@ ylim([min(error_Z_std(:))-1 max(error_Z_std(:))+1])
 % title('Зависимость средней ошибки оценивания координат особой точки от времени')
 % ylim([min(error_XYZ_mean(:))-1 max(error_XYZ_mean(:))+1])
 
-% %% Expected value 0
-% figure
-% plot(l,error_X_std_EV0)
-% legend ('СКО при EV=0 по координате Y')
-% xlabel('Время,с')
-% ylabel('СКО при EV=0, м')
-% grid on
-% title('Зависимость СКО по X при EV=0 в каждый момент времени')
-% ylim([min(error_X_std_EV0(:))-1 max(error_X_std_EV0(:))+1])
-% 
-% figure
-% plot(l,error_Y_std_EV0)
-% legend ('СКО при EV=0 по координате Y')
-% xlabel('Время,с')
-% ylabel('СКО при EV=0, м')
-% grid on
-% title('Зависимость СКО по Y при EV=0 в каждый момент времени')
-% ylim([min(error_Y_std_EV0(:))-1 max(error_Y_std_EV0(:))+1])
-% 
-% figure
-% plot(l,error_Z_std_EV0)
-% legend ('СКО при EV=0 по координате Z')
-% xlabel('Время,с')
-% ylabel('СКО при EV=0, м')
-% grid on
-% title('Зависимость СКО по Z при EV=0 в каждый момент времени')
-% ylim([min(error_Z_std_EV0(:))-1 max(error_Z_std_EV0(:))+1])
+%% Expected value 0
+figure
+plot(l,error_X_std_EV0)
+legend ('СКО при EV=0 по координате Y')
+xlabel('Время,с')
+ylabel('СКО при EV=0, м')
+grid on
+title('Зависимость СКО по X при EV=0 в каждый момент времени')
+ylim([min(error_X_std_EV0(:))-1 max(error_X_std_EV0(:))+1])
+
+figure
+plot(l,error_Y_std_EV0)
+legend ('СКО при EV=0 по координате Y')
+xlabel('Время,с')
+ylabel('СКО при EV=0, м')
+grid on
+title('Зависимость СКО по Y при EV=0 в каждый момент времени')
+ylim([min(error_Y_std_EV0(:))-1 max(error_Y_std_EV0(:))+1])
+
+figure
+plot(l,error_Z_std_EV0)
+legend ('СКО при EV=0 по координате Z')
+xlabel('Время,с')
+ylabel('СКО при EV=0, м')
+grid on
+title('Зависимость СКО по Z при EV=0 в каждый момент времени')
+ylim([min(error_Z_std_EV0(:))-1 max(error_Z_std_EV0(:))+1])

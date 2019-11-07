@@ -1,4 +1,4 @@
-function [error,MODEL_TIME_SEC,F_frame,T,N_MODEL] = Basic()
+ function [error,MODEL_TIME_SEC,F_frame,T,N_MODEL,seed] = Basic()
 %%%%
 % point coordinates estimation
 % we know our ENU coordinates
@@ -11,9 +11,11 @@ function [error,MODEL_TIME_SEC,F_frame,T,N_MODEL] = Basic()
 clear all
 close all
 clc
+seed = abs(floor(100*randn(1,1)));
+rng(seed);
 
 %% OPTIONS
-MODEL_TIME_SEC = 100;   %observation time
+MODEL_TIME_SEC = 200;   %observation time
 F_frame = 24;           %frames per second
 T = 1/F_frame;          %frame duration
 N_MODEL = ceil(MODEL_TIME_SEC/T);   %number of observations
@@ -89,14 +91,14 @@ Y = FramePoint + randn(2,1)*Point_estim.filter.sko_Frame_Meas; % measurements - 
 %% 2. Растущая ошибка с количеством измерений для всех углов
 
 T_error=30;
-Ufi_error_deg = k*(1/N_MODEL);      %к концу времени наблюдеия добавится 1 градус ошибки
+Ufi_error_deg = 1 + 0*k*(1/N_MODEL);      %к концу времени наблюдеия добавится 1 градус ошибки
 Ufi_error = deg2rad(Ufi_error_deg);
-fi_error = Ufi_error*sin(tt*(2*pi/T_error));
-
+fi_error = Ufi_error +0*sin(tt*(2*pi/T_error));
+fi_error_mas(1,k) = fi_error;
 %%
-fi1_with_error = Ufi1*sin(tt*(2*pi/Tturn)) + fi_error;
-fi2_with_error = Ufi2*sin(tt*(2*pi/Tturn)) + fi_error;
-fi3_with_error = Ufi3*sin(tt*(2*pi/Tturn)) + fi_error;
+fi1_with_error = Ufi1*sin(tt*(2*pi/Tturn)) + 0*1*fi_error;
+fi2_with_error = Ufi2*sin(tt*(2*pi/Tturn)) + 0*1*fi_error;
+fi3_with_error = Ufi3*sin(tt*(2*pi/Tturn)) + 0*60*fi_error;
 
 %%
 ENU2RPY1_with_error = [1 0 0; 0 cos(fi1_with_error) sin(fi1_with_error); 0 -sin(fi1_with_error) cos(fi1_with_error)]; % X with error
@@ -158,14 +160,14 @@ end
 t=1:k;          %all observations
 l=t/F_frame; 
 
-% figure
-% plot(l,error)
-% legend ('Ошибка по координате x1','Ошибка по координате x2','Ошибка по координате x3')
-% xlabel('Время,с')
-% ylabel('Ошибка оценивания,м')
-% grid on
-% title('Зависимость ошибки оценивания координат особой точки от времени')
-% ylim([error_min-1 error_max+1])
+figure
+plot(l,error)
+legend ('Ошибка по координате x1','Ошибка по координате x2','Ошибка по координате x3')
+xlabel('Время,с')
+ylabel('Ошибка оценивания,м')
+grid on
+title('Зависимость ошибки оценивания координат особой точки от времени')
+ylim([error_min-1 error_max+1])
 
 %{
 figure
