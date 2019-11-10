@@ -45,8 +45,10 @@ Ufi3deg = 60;           % amplitude of turn (deg) relative to Z
 error_deg = 1;          % by the end of simulation time error wiil be "error_deg" deg
 
 %%
-amount = 7;     %Number of runs. Minimum 2
+amount = 2;     %Number of runs. Minimum 2
 for i = 1:1:amount
+
+%Point_estim = Point_estim_init(2);
 
 %% Pinhole camera model
 [Y, FramePoint, ENU2RPY_with_error, POINT_RPY] = Camera_rotation(Tturn, Ufi1deg, Ufi2deg, Ufi3deg, error_deg, PointZ, myX, Point_estim, N_MODEL, tt, k);
@@ -69,10 +71,33 @@ end
       
 end
 
+for j = 1:1:N_MODEL
+%% RMSE (EV = 0) on X, Y, Z for every time of simulation for 'amount' realizations
+%expected value = 0
+error_X_std_EV0(j:N_MODEL) = sqrt((sum(error_X(:,j).^2)/(amount-1)));
+error_Y_std_EV0(j:N_MODEL) = sqrt((sum(error_Y(:,j).^2)/(amount-1)));
+error_Z_std_EV0(j:N_MODEL) = sqrt((sum(error_Z(:,j).^2)/(amount-1)));
+
+error_XYZ_std_EV0 = [error_X_std_EV0; error_Y_std_EV0; error_Z_std_EV0];
+end
+
+
 
 %%
 t=1:N_MODEL;          %all observations
 l=t/F_frame; 
+
+
+%% All 3 coordinates RMSE 
+figure
+plot(l,error_XYZ_std_EV0)
+legend ('???? ?? X', '???? ?? Y', '???? ?? Z ??? ??????? ??????? ??????? ??? N ??????????')
+xlabel('?????,?')
+ylabel('???, ?')
+grid on
+title('??????????? ???? ????????? ?????? ????? ?? ???????')
+ylim([min(error_XYZ_std_EV0(:))-1 max(error_XYZ_std_EV0(:))+1])
+
 
 %% X coordinate
 figure
@@ -103,6 +128,8 @@ ylabel('Ошибка оценивания,м')
 grid on
 title('Зависимость ошибки оценивания координат особой точки от времени')
 ylim([min(error_Z(:))-1 max(error_Z(:))+1])
+
+
 
 %% Camera Movement 
 % figure; plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:) ); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); grid on
