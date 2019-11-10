@@ -1,6 +1,8 @@
-function [Y, FramePoint, ENU2RPY_with_error, POINT_RPY] = Camera_rotation(Tturn, Ufi1deg, Ufi2deg, Ufi3deg, error_deg, PointZ, myX, Point_estim, N_MODEL, tt, k)
-%% Camera Rotation
+function [Frame_Point_mas, xoc_mas, error] = FramePoint_and_EKF(Tturn, Ufi1deg, Ufi2deg, Ufi3deg, error_deg, PointZ, myX_mas, Point_estim, N_MODEL, T, Xcam_mas)
 
+for k = 1:N_MODEL  
+tt = k*T;
+%% Camera Rotation
 Ufi1 = deg2rad(Ufi1deg);            % amplitude of turn relative to X
 fi1 = Ufi1*sin(tt*(2*pi/Tturn));    % angle of turn
 
@@ -19,7 +21,7 @@ ENU2RPY3 = [cos(fi3) sin(fi3) 0; -sin(fi3) cos(fi3) 0; 0 0 1]; % Z
 ENU2RPY = ENU2RPY3*ENU2RPY2*ENU2RPY1; % rotation matrix
 
 %% Pinhole camera model
-POINT_RPY = ENU2RPY*(PointZ-myX); %true point coordinates in RPY frame
+POINT_RPY = ENU2RPY*(PointZ-myX_mas(:, k)); %true point coordinates in RPY frame
 FramePoint(1:2,1) = Point_estim.camera.Cam_F/POINT_RPY(3)*[POINT_RPY(1); POINT_RPY(2)]; % true frame coordinates
 Y = FramePoint + randn(2,1)*Point_estim.filter.sko_Frame_Meas; % measurements - frame coordinates with noise
 
@@ -50,3 +52,33 @@ ENU2RPY2_with_error = [cos(fi2_with_error) 0 -sin(fi2_with_error); 0 1 0; sin(fi
 ENU2RPY3_with_error = [cos(fi3_with_error) sin(fi3_with_error) 0; -sin(fi3_with_error) cos(fi3_with_error) 0; 0 0 1]; % Z with error
 
 ENU2RPY_with_error = ENU2RPY3_with_error*ENU2RPY2_with_error*ENU2RPY1_with_error;   %rotation matrix with error
+
+
+%% Extended Kalman Flter 
+%% Extrapolation
+Point_estim = Point_estim_extrap(Point_estim);
+
+%% Correction
+% if special point hit into camera lens => correction stage
+if (abs(FramePoint(1))<Point_estim.camera.L/2) && (abs(FramePoint(2))<Point_estim.camera.L/2) && (POINT_RPY(3)>0)
+    [Point_estim] = Point_estim_correct(Point_estim,Xcam_mas,ENU2RPY_with_error,Y,k);
+    phantom = 0;
+
+% else / if special point don't hit into camera lens => accept extrapolation values 
+% as a priori/starting coordinates special point and variance matrix of the estimation vector state
+else
+    Point_estim.filter.xoc = Point_estim.filter.x_extr;
+    Point_estim.filter.Dx = Point_estim.filter.Dx_extr; 
+    phantom = 1;
+end 
+%% save for plot
+Frame_Point_mas(:,k) = Y;
+if phantom == 1
+    Frame_Point_mas(1:2,k) = nan; % don't building phantom points
+end
+
+% Results
+xoc_mas(:,k)=Point_estim.filter.xoc;            
+error(:,k)=Point_estim.filter.xoc-PointZ; 
+
+end

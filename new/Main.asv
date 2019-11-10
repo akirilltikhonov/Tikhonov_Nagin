@@ -24,15 +24,13 @@ PointZ = [0;1;5];       % true point coordinates in ENU frame
 ENU2RPY = eye(3);       % rotation matrix RPY to ENU
 RPY2ENU = ENU2RPY';     % rotation matrix ENU to RPY
 
-%% filter and camera initialization
+%% Filter and camera initialization
 Point_estim = Point_estim_init(2);
 
 %%
-for k = 1:N_MODEL  
-tt = k*T;
+
 %% Camera dynamic
-[Xcam, myX] = Dynamic(Vku, wVu, sko_Coordinate_Meas, tt);
-myX_mas(:,k) = myX;     % all points camera position
+[Xcam_mas, myX_mas] = Dynamic(Vku, wVu, sko_Coordinate_Meas, N_MODEL, T);
 
 %% Camera rotation and framepoint
 Tturn=3;                % period of turn
@@ -40,14 +38,14 @@ Ufi1deg = 0;            % amplitude of turn (deg) relative to X
 Ufi2deg = 0;            % amplitude of turn (deg) relative to Y
 Ufi3deg = 60;           % amplitude of turn (deg) relative to Z
 
-% ENU2RPY error
+%% ENU2RPY error
 %T_error = 30;           
 error_deg = 1;          % by the end of simulation time error wiil be "error_deg" deg
 
-
-amount = 20;     %Number of runs. Minimum 2
+%% Pinhole camera model and EKF
+amount = 20;
 for i = 1:1:amount
-[error, F_frame, T, N_MODEL] = Basic(MODEL_TIME_SEC);
+[Frame_Point_mas, xoc_mas, error] = Camera_rotation(Tturn, Ufi1deg, Ufi2deg, Ufi3deg, error_deg, PointZ, myX_mas, Point_estim, N_MODEL, T, Xcam_mas);  
 
 error_XYZ(3*i-2:3*i, 1:N_MODEL) = error;
 
@@ -56,37 +54,33 @@ error_Y(i,1:N_MODEL) = error(2,:);
 error_Z(i,1:N_MODEL) = error(3,:);
 end
 
-[Y, FramePoint, ENU2RPY_with_error, POINT_RPY] = Camera_rotation(Tturn, Ufi1deg, Ufi2deg, Ufi3deg, error_deg, PointZ, myX, Point_estim, N_MODEL, tt, k);
 
-%% EKF
-[Point_estim, Frame_Point_Y] = EKF (Point_estim, FramePoint, POINT_RPY, Xcam, ENU2RPY_with_error, Y)
-Frame_Point_mas(1:2,k) = Frame_Point_Y;
-%% Results
-xoc_mas(:,k)=Point_estim.filter.xoc;            
-error(:,k)=Point_estim.filter.xoc-PointZ;       
-end
-
-
-%% camera Movement
-figure; plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:) ); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); grid on
-xlabel('X1')
-ylabel('X2')
-zlabel('X3')
+%% Camera Movement: 
+%% without RTK solution
+% figure; plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:) ); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); grid on
+% xlabel('X1')
+% ylabel('X2')
+% zlabel('X3')
+% %% with RTK solution
+% figure; plot3(Xcam_mas(1,:), Xcam_mas(2,:),Xcam_mas(3,:) ); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); grid on
+% xlabel('X1')
+% ylabel('X2')
+% zlabel('X3')
 
 %% Trajectory point on the screen
-figure
-comet(Frame_Point_mas(1,:), Frame_Point_mas(2,:));
-xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
-ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 
-figure
-plot(Frame_Point_mas(1,:), Frame_Point_mas(2,:), '*');
-xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
-ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+% figure
+% comet(Frame_Point_mas(1,:), Frame_Point_mas(2,:));
+% xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+% ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+% 
+% figure
+% plot(Frame_Point_mas(1,:), Frame_Point_mas(2,:), '*');
+% xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+% ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 
 %%
-
-t=1:k;          %all observations
+t=1:N_MODEL;          %all observations
 l=t/F_frame; 
 
 figure

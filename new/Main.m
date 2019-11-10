@@ -28,11 +28,9 @@ RPY2ENU = ENU2RPY';     % rotation matrix ENU to RPY
 Point_estim = Point_estim_init(2);
 
 %%
-for k = 1:N_MODEL  
-tt = k*T;
+
 %% Camera dynamic
-[Xcam, myX] = Dynamic(Vku, wVu, sko_Coordinate_Meas, tt);
-myX_mas(:,k) = myX;     % all points camera position
+[Xcam_mas, myX_mas] = Dynamic(Vku, wVu, sko_Coordinate_Meas, N_MODEL, T);
 
 %% Camera rotation and framepoint
 Tturn=3;                % period of turn
@@ -44,56 +42,95 @@ Ufi3deg = 60;           % amplitude of turn (deg) relative to Z
 %T_error = 30;           
 error_deg = 1;          % by the end of simulation time error wiil be "error_deg" deg
 
-%% Pinhole camera model
-[Y, FramePoint, ENU2RPY_with_error, POINT_RPY] = Camera_rotation(Tturn, Ufi1deg, Ufi2deg, Ufi3deg, error_deg, PointZ, myX, Point_estim, N_MODEL, tt, k);
+%% FramePoint (Pinhole camera model) and EKF
+amount = 10;
+for i = 1:1:amount
+Point_estim = Point_estim_init(2);      % установка начального приближения для фильтра    
+[Frame_Point_mas, xoc_mas, error] = FramePoint_and_EKF(Tturn, Ufi1deg, Ufi2deg, Ufi3deg, error_deg, PointZ, myX_mas, Point_estim, N_MODEL, T, Xcam_mas);
 
-%% EKF
-[Point_estim, Frame_Point_Y] = EKF (Point_estim, FramePoint, POINT_RPY, Xcam, ENU2RPY_with_error, Y)
-Frame_Point_mas(1:2,k) = Frame_Point_Y;
+error_XYZ(3*i-2:3*i, 1:N_MODEL) = error;
 
-%% Results
-xoc_mas(:,k)=Point_estim.filter.xoc;            
-error(:,k)=Point_estim.filter.xoc-PointZ;       
+error_X(i,1:N_MODEL) = error(1,:);
+error_Y(i,1:N_MODEL) = error(2,:);
+error_Z(i,1:N_MODEL) = error(3,:);
 end
 
-%% Camera Movement 
-figure; plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:) ); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); grid on
-xlabel('X1')
-ylabel('X2')
-zlabel('X3')
+for j = 1:1:N_MODEL
+%% RMSE (EV = 0) on X, Y, Z for every time of simulation for 'amount' realizations
+%expected value = 0
+error_X_std_EV0(j:N_MODEL) = sqrt((sum(error_X(:,j).^2)/(amount-1)));
+error_Y_std_EV0(j:N_MODEL) = sqrt((sum(error_Y(:,j).^2)/(amount-1)));
+error_Z_std_EV0(j:N_MODEL) = sqrt((sum(error_Z(:,j).^2)/(amount-1)));
+
+error_XYZ_std_EV0 = [error_X_std_EV0; error_Y_std_EV0; error_Z_std_EV0];
+end
+
+% %% Camera Movement: 
+% % without RTK solution
+% figure; plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:) ); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); grid on
+% xlabel('X1')
+% ylabel('X2')
+% zlabel('X3')
+% %% with RTK solution
+% figure; plot3(Xcam_mas(1,:), Xcam_mas(2,:),Xcam_mas(3,:) ); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); grid on
+% xlabel('X1')
+% ylabel('X2')
+% zlabel('X3')
 
 %% Trajectory point on the screen
 
-figure
-comet(Frame_Point_mas(1,:), Frame_Point_mas(2,:));
-xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
-ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+% figure
+% comet(Frame_Point_mas(1,:), Frame_Point_mas(2,:));
+% xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+% ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+% 
+% figure
+% plot(Frame_Point_mas(1,:), Frame_Point_mas(2,:), '*');
+% xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+% ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 
-figure
-plot(Frame_Point_mas(1,:), Frame_Point_mas(2,:), '*');
-xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
-ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 
-%%
-
-t=1:k;          %all observations
+t=1:N_MODEL;          %all observations
 l=t/F_frame; 
 
+%% X coordinate
 figure
-plot(l,error)
-legend ('Ошибка по координате x1','Ошибка по координате x2','Ошибка по координате x3')
+plot(l,error_X)
+legend ('Ошибка по координате X для N прогонов')
 xlabel('Время,с')
 ylabel('Ошибка оценивания,м')
 grid on
 title('Зависимость ошибки оценивания координат особой точки от времени')
-ylim([min(error(:))-1 max(error(:))+1])
+ylim([min(error_X(:))-1 max(error_X(:))+1])
 
+%% Y coordinate
 figure
-plot(l,xoc_mas)
-legend ('x1','x2','x3')
+plot(l,error_Y)
+legend ('Ошибка по координате Y для N прогонов')
 xlabel('Время,с')
-ylabel('координаты особой точки,м')
+ylabel('Ошибка оценивания,м')
 grid on
-title('зависимость изменения координат особой точки от времени')
+title('Зависимость ошибки оценивания координат особой точки от времени')
+ylim([min(error_Y(:))-1 max(error_Y(:))+1])
+
+%% Z coordinate
+figure
+plot(l,error_Z)
+legend ('Ошибка по координате Z для N прогонов')
+xlabel('Время,с')
+ylabel('Ошибка оценивания,м')
+grid on
+title('Зависимость ошибки оценивания координат особой точки от времени')
+ylim([min(error_Z(:))-1 max(error_Z(:))+1])
+
+%% All 3 coordinates RMSE 
+figure
+plot(l,error_XYZ_std_EV0)
+legend ('СКОш по X', 'СКОш по Y', 'СКОш по Z для каждого момента времени для N реализаций')
+xlabel('Время,с')
+ylabel('СКО, м')
+grid on
+title('Зависимость СКОш координат особой точки от времени')
+ylim([min(error_XYZ_std_EV0(:))-1 max(error_XYZ_std_EV0(:))+1])
 
 
