@@ -47,7 +47,7 @@ error_deg = 1;          % by the end of simulation time error wiil be "error_deg
 [Xcam_mas, myX_mas, seed_RTK] = Dynamic(Vku, wVu, sko_Coordinate_Meas, N_MODEL, T);
 
 %% FramePoint (Pinhole camera model) and EKF
-amount = 10;
+amount = 20;
 for i = 1:1:amount
 Point_estim = Point_estim_init(2);      % установка начального приближения для фильтра    
 [Frame_Point_mas, xoc_mas, error,seed_skoFrame] = FramePoint_and_EKF(Tturn, Ufi1deg, Ufi2deg, Ufi3deg, error_deg, PointZ, myX_mas, Point_estim, N_MODEL, T, Xcam_mas);
@@ -75,15 +75,20 @@ end
 
 % %% Camera Movement: 
 % % without RTK solution
-% figure; plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:) ); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); grid on
-% xlabel('X1')
-% ylabel('X2')
-% zlabel('X3')
+figure; plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:)); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); hold on; plot3(myX_mas(1,1), myX_mas(2,1),myX_mas(3,1) ,'*');
+hold on; arrow3([myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)], [myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)+2]);
+text (myX_mas(1,1), myX_mas(2,1), myX_mas(3,1), '  Камера');
+text (PointZ(1),PointZ(2),PointZ(3), '  Особая точка');
+grid on
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+
 % %% with RTK solution
 % figure; plot3(Xcam_mas(1,:), Xcam_mas(2,:),Xcam_mas(3,:) ); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); grid on
-% xlabel('X1')
-% ylabel('X2')
-% zlabel('X3')
+% xlabel('X')
+% ylabel('Y')
+% zlabel('Z')
 
 %% Trajectory point on the screen
 
@@ -92,10 +97,10 @@ end
 % xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 % ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 % 
-% figure
-% plot(Frame_Point_mas(1,:), Frame_Point_mas(2,:), '*');
-% xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
-% ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+figure
+plot(Frame_Point_mas(1,:), Frame_Point_mas(2,:), '*');
+xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 
 
 t=1:N_MODEL;          %all observations
@@ -134,9 +139,9 @@ ylim([min(error_Z(:))-1 max(error_Z(:))+1])
 %% All 3 coordinates RMSE 
 figure
 plot(l,error_XYZ_RMSE)
-legend ('СКОш по X', 'СКОш по Y', 'СКОш по Z для каждого момента времени для N реализаций')
+legend ('СКОш по X для каждого момента времени для N реализаций', 'СКОш по Y для каждого момента времени для N реализаций', 'СКОш по Z для каждого момента времени для N реализаций')
 xlabel('Время,с')
-ylabel('СКО, м')
+ylabel('СКОш, м')
 grid on
 title('Зависимость СКОш координат особой точки от времени')
 ylim([min(error_XYZ_RMSE(:))-1 max(error_XYZ_RMSE(:))+1])
