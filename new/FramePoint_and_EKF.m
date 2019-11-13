@@ -1,4 +1,6 @@
-function [Frame_Point_mas, xoc_mas, error] = FramePoint_and_EKF(Tturn, Ufi1deg, Ufi2deg, Ufi3deg, error_deg, PointZ, myX_mas, Point_estim, N_MODEL, T, Xcam_mas)
+function [Frame_Point_mas, xoc_mas, error, seed_skoFrame] = FramePoint_and_EKF(Tturn, Ufi1deg, Ufi2deg, Ufi3deg, error_deg, PointZ, myX_mas, Point_estim, N_MODEL, T, Xcam_mas)
+%%
+% load('skoFrame.mat')    % load seed skoFrame
 
 for k = 1:N_MODEL  
 tt = k*T;
@@ -21,9 +23,16 @@ ENU2RPY3 = [cos(fi3) sin(fi3) 0; -sin(fi3) cos(fi3) 0; 0 0 1]; % Z
 ENU2RPY = ENU2RPY3*ENU2RPY2*ENU2RPY1; % rotation matrix
 
 %% Pinhole camera model
-POINT_RPY = ENU2RPY*(PointZ-myX_mas(:, k)); %true point coordinates in RPY frame
+
+% skoFrame(:,k)
+
+skoFrame = randn(2,1);
+
+POINT_RPY = ENU2RPY*(PointZ-myX_mas(:,k)); %true point coordinates in RPY frame
 FramePoint(1:2,1) = Point_estim.camera.Cam_F/POINT_RPY(3)*[POINT_RPY(1); POINT_RPY(2)]; % true frame coordinates
-Y = FramePoint + randn(2,1)*Point_estim.filter.sko_Frame_Meas; % measurements - frame coordinates with noise
+Y = FramePoint + skoFrame*Point_estim.filter.sko_Frame_Meas; % measurements - frame coordinates with noise
+
+seed_skoFrame(:,k) = skoFrame;
 
 %% ENU2RPY with error
 %% 1. Постоянная ошибка для всех углов

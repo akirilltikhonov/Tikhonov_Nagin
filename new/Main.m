@@ -27,11 +27,6 @@ RPY2ENU = ENU2RPY';     % rotation matrix ENU to RPY
 %% Filter and camera initialization
 Point_estim = Point_estim_init(2);
 
-%%
-
-%% Camera dynamic
-[Xcam_mas, myX_mas] = Dynamic(Vku, wVu, sko_Coordinate_Meas, N_MODEL, T);
-
 %% Camera rotation and framepoint
 Tturn=3;                % period of turn
 Ufi1deg = 0;            % amplitude of turn (deg) relative to X
@@ -42,27 +37,40 @@ Ufi3deg = 60;           % amplitude of turn (deg) relative to Z
 %T_error = 30;           
 error_deg = 1;          % by the end of simulation time error wiil be "error_deg" deg
 
+
+
+
+
+%% Main algorithm
+
+%% Camera dynamic
+[Xcam_mas, myX_mas, seed_RTK] = Dynamic(Vku, wVu, sko_Coordinate_Meas, N_MODEL, T);
+
 %% FramePoint (Pinhole camera model) and EKF
 amount = 10;
 for i = 1:1:amount
 Point_estim = Point_estim_init(2);      % установка начального приближения для фильтра    
-[Frame_Point_mas, xoc_mas, error] = FramePoint_and_EKF(Tturn, Ufi1deg, Ufi2deg, Ufi3deg, error_deg, PointZ, myX_mas, Point_estim, N_MODEL, T, Xcam_mas);
+[Frame_Point_mas, xoc_mas, error,seed_skoFrame] = FramePoint_and_EKF(Tturn, Ufi1deg, Ufi2deg, Ufi3deg, error_deg, PointZ, myX_mas, Point_estim, N_MODEL, T, Xcam_mas);
 
 error_XYZ(3*i-2:3*i, 1:N_MODEL) = error;
 
 error_X(i,1:N_MODEL) = error(1,:);
 error_Y(i,1:N_MODEL) = error(2,:);
 error_Z(i,1:N_MODEL) = error(3,:);
+
+
+seed_skoFrame_mas(2*i-1:2*i, 1:N_MODEL) = seed_skoFrame;
+
 end
 
 for j = 1:1:N_MODEL
-%% RMSE (EV = 0) on X, Y, Z for every time of simulation for 'amount' realizations
+%% RMSE on X, Y, Z for every time of simulation for 'amount' realizations
 %expected value = 0
-error_X_std_EV0(j:N_MODEL) = sqrt((sum(error_X(:,j).^2)/(amount-1)));
-error_Y_std_EV0(j:N_MODEL) = sqrt((sum(error_Y(:,j).^2)/(amount-1)));
-error_Z_std_EV0(j:N_MODEL) = sqrt((sum(error_Z(:,j).^2)/(amount-1)));
+error_X_RMSE(j:N_MODEL) = sqrt((sum(error_X(:,j).^2)/(amount-1)));
+error_Y_RMSE(j:N_MODEL) = sqrt((sum(error_Y(:,j).^2)/(amount-1)));
+error_Z_RMSE(j:N_MODEL) = sqrt((sum(error_Z(:,j).^2)/(amount-1)));
 
-error_XYZ_std_EV0 = [error_X_std_EV0; error_Y_std_EV0; error_Z_std_EV0];
+error_XYZ_RMSE = [error_X_RMSE; error_Y_RMSE; error_Z_RMSE];
 end
 
 % %% Camera Movement: 
@@ -125,12 +133,12 @@ ylim([min(error_Z(:))-1 max(error_Z(:))+1])
 
 %% All 3 coordinates RMSE 
 figure
-plot(l,error_XYZ_std_EV0)
+plot(l,error_XYZ_RMSE)
 legend ('СКОш по X', 'СКОш по Y', 'СКОш по Z для каждого момента времени для N реализаций')
 xlabel('Время,с')
 ylabel('СКО, м')
 grid on
 title('Зависимость СКОш координат особой точки от времени')
-ylim([min(error_XYZ_std_EV0(:))-1 max(error_XYZ_std_EV0(:))+1])
+ylim([min(error_XYZ_RMSE(:))-1 max(error_XYZ_RMSE(:))+1])
 
 
