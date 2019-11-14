@@ -11,7 +11,7 @@ clear all
 close all
 clc
 
-%% OPTIONS
+%% MAIN OPTIONS
 MODEL_TIME_SEC = 100;   % observation time
 F_frame = 24;           % frames per second
 T = 1/F_frame;          % frame duration
@@ -33,35 +33,36 @@ Ufi1deg = 0;            % amplitude of turn (deg) relative to X
 Ufi2deg = 0;            % amplitude of turn (deg) relative to Y
 Ufi3deg = 60;           % amplitude of turn (deg) relative to Z
 
-%% ENU2RPY error
-%T_error = 30;           
+%% ENU2RPY error   
 error_deg = 1;          % by the end of simulation time error wiil be "error_deg" deg
 
-
-
-
-
 %% Main algorithm
-
 %% Camera dynamic
-[Xcam_mas, myX_mas, seed_RTK] = Dynamic(Vku, wVu, sko_Coordinate_Meas, N_MODEL, T);
+[myX_mas,FramePoint_mas,POINT_RPY3_mas, ENU2RPY_with_error_mas] = Dynamic(Vku, wVu, N_MODEL, T, PointZ, Point_estim, Tturn, Ufi1deg, Ufi2deg, Ufi3deg, error_deg);
 
-%% FramePoint (Pinhole camera model) and EKF
+
+%% FramePoint (Y) and EKF
 amount = 20;
 for i = 1:1:amount
-Point_estim = Point_estim_init(2);      % установка начального приближения для фильтра    
-[Frame_Point_mas, xoc_mas, error,seed_skoFrame] = FramePoint_and_EKF(Tturn, Ufi1deg, Ufi2deg, Ufi3deg, error_deg, PointZ, myX_mas, Point_estim, N_MODEL, T, Xcam_mas);
 
+%%
+seed(i) = rng();
+RTK = randn(3,N_MODEL);
+skoFrame = randn(2,N_MODEL);
+
+%%
+% Point_estim = Point_estim_init(2);      % установка начального приближения для фильтра    
+[Frame_Point_mas, xoc_mas, error] = FramePoint_and_EKF(ENU2RPY_with_error_mas, POINT_RPY3_mas,FramePoint_mas, myX_mas, PointZ, sko_Coordinate_Meas, Point_estim, N_MODEL, T, RTK, skoFrame);
+
+%% Error
 error_XYZ(3*i-2:3*i, 1:N_MODEL) = error;
 
 error_X(i,1:N_MODEL) = error(1,:);
 error_Y(i,1:N_MODEL) = error(2,:);
 error_Z(i,1:N_MODEL) = error(3,:);
-
-
-seed_skoFrame_mas(2*i-1:2*i, 1:N_MODEL) = seed_skoFrame;
-
 end
+
+save('seed.mat', 'seed');       % save 'seed' random realizations of noise RTK and skoFrame
 
 for j = 1:1:N_MODEL
 %% RMSE on X, Y, Z for every time of simulation for 'amount' realizations
@@ -73,8 +74,8 @@ error_Z_RMSE(j:N_MODEL) = sqrt((sum(error_Z(:,j).^2)/(amount-1)));
 error_XYZ_RMSE = [error_X_RMSE; error_Y_RMSE; error_Z_RMSE];
 end
 
-% %% Camera Movement: 
-% % without RTK solution
+%% Camera Movement: 
+%% without RTK solution
 figure; plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:)); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); hold on; plot3(myX_mas(1,1), myX_mas(2,1),myX_mas(3,1) ,'*');
 hold on; arrow3([myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)], [myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)+2]);
 text (myX_mas(1,1), myX_mas(2,1), myX_mas(3,1), '  Камера');
@@ -98,7 +99,7 @@ zlabel('Z')
 % ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 % 
 figure
-plot(Frame_Point_mas(1,:), Frame_Point_mas(2,:), '*');
+plot(Frame_Point_mas(1,:), Frame_Point_mas(2,:), '-*');
 xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 
