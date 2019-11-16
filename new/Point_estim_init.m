@@ -13,7 +13,7 @@ Point_estim.filter.Dn = diag([Point_estim.filter.sko_Frame_Meas,Point_estim.filt
 %observation on a two-dimensional (camera) image
 
 %Dksi
-Point_estim.filter.ksi_sko=0.05;    %rms deviation of model dinamic
+Point_estim.filter.ksi_sko=0.01;    %rms deviation of model dinamic
 Point_estim.filter.Dksi = diag([Point_estim.filter.ksi_sko, Point_estim.filter.ksi_sko, Point_estim.filter.ksi_sko]).^2;
 % model dinamic noise variance matrix
 
