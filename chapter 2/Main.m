@@ -12,7 +12,7 @@ close all
 clc
 
 %% MAIN OPTIONS
-MODEL_TIME_SEC = 100;   % observation time
+MODEL_TIME_SEC = 200;   % observation time
 F_frame = 24;           % frames per second
 T = 1/F_frame;          % frame duration
 N_MODEL = ceil(MODEL_TIME_SEC/T);   % number of observations
@@ -30,7 +30,7 @@ Point_estim = Point_estim_init(2);
 %% Camera rotation and framepoint
 Tturn=3;                % period of turn
 Ufi1deg = 0;            % amplitude of turn (deg) relative to X
-Ufi2deg = 0;            % amplitude of turn (deg) relative to Y
+Ufi2deg = 60;            % amplitude of turn (deg) relative to Y
 Ufi3deg = 60;           % amplitude of turn (deg) relative to Z
 
 %% ENU2RPY error   
