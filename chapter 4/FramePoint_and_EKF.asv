@@ -1,4 +1,4 @@
-function [Y2_mas, x2_mas, error, normQ, normX2] = FramePoint_and_EKF(fi123_mas, Options, FramePoint_mas, myX_mas, Point_estim, POINT_RPY3_mas)
+function [Y2_mas, x2_mas, error] = FramePoint_and_EKF(fi123_mas, Options, FramePoint_mas, myX_mas, Point_estim, POINT_RPY3_mas)
 
 for k = 1:1:Options.N_MODEL  
 tt = k*Options.T;
@@ -54,9 +54,8 @@ x2_mas(:,k) = q2rotv(Point_estim.filter.x2);
 error(:,k) = rad2deg(q2rotv(Point_estim.filter.x2) - fi123_mas(:,k)); 
 
 Q = rotv2q(fi123_mas(:,k));
-normQ (:,k) = sqrt(Q(1)^2 + Q(2)^2 + Q(3)^2 + Q(4)^2);
 
-normX2 (:,k) = sqrt(Point_estim.filter.x2(1)^2 + Point_estim.filter.x2(2)^2 + Point_estim.filter.x2(3)^2 + Point_estim.filter.x2(4)^2);
+Q(1)^2 + Q(2)^2 + Q(3)^2 + Q(4)^2
 
 
 

@@ -9,7 +9,7 @@ Options.sko_Coordinate_Meas = 0.05;     % RTK solution
 Options.wVu = 0.5;                      % radial frequency
 Options.Vku = 2;                        % max velocity
 Options.PointZ1 = [0;1;5];              % true coordinates of special point1 in ENU frame
-% Options.PointZ2 = [0;-1;5];             % true coordinates of special point2 in ENU frame
+Options.PointZ2 = [0;-1;5];             % true coordinates of special point2 in ENU frame
 Options.ENU2RPY = eye(3);               % rotation matrix RPY to ENU
 Options.RPY2ENU = Options.ENU2RPY';     % rotation matrix ENU to RPY
 

@@ -58,13 +58,13 @@ myX_mas(:,k) = myX;     % all points camera position
 
  %% FramePoints without skoFrame
 POINT_RPY1 = ENU2RPY*(Options.PointZ1-myX);        % coordinates of special point 1 in RPY
-% POINT_RPY2 = ENU2RPY*(Options.PointZ2-myX);        % coordinates of special point 2 in RPY
+POINT_RPY2 = ENU2RPY*(Options.PointZ2-myX);        % coordinates of special point 2 in RPY
 
-POINT_RPY3_mas(:,k) = POINT_RPY1(3);
+POINT_RPY3_mas(:,k) = [POINT_RPY1(3); POINT_RPY2(3)];
 
 FramePoint1(1:2,1) = Point_estim.camera.Cam_F/POINT_RPY1(3)*[POINT_RPY1(1); POINT_RPY1(2)]; % true frame coordinates special point 1
-% FramePoint2(1:2,1) = Point_estim.camera.Cam_F/POINT_RPY2(3)*[POINT_RPY2(1); POINT_RPY2(2)]; % true frame coordinates special point 2
+FramePoint2(1:2,1) = Point_estim.camera.Cam_F/POINT_RPY2(3)*[POINT_RPY2(1); POINT_RPY2(2)]; % true frame coordinates special point 2
 
-FramePoint_mas(:,k) = FramePoint1;
+FramePoint_mas(:,k) = [FramePoint1; FramePoint2];
 
 end

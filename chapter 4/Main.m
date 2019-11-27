@@ -19,7 +19,7 @@ Point_estim = Point_estim_init(2, Options);
 
 %% Main algorithm
 %% Camera dynamic
-[fi123_mas, myX_mas,FramePoint_mas,POINT_RPY3_mas] = Dynamic(Options,Point_estim);
+[fi123_mas,myX_mas,FramePoint_mas,POINT_RPY3_mas] = Dynamic(Options,Point_estim);
 
 
 %% FramePoint (Y) and EKF
@@ -30,11 +30,13 @@ Point_estim = Point_estim_init(2, Options);
 % seed(i) = rng();
 Options.RTKcam = randn(3,Options.N_MODEL);
 Options.RTKpointZ1 = randn(3,Options.N_MODEL);
-% Options.RTKpointZ2 = randn(3,Options.N_MODEL);
+Options.RTKpointZ2 = randn(3,Options.N_MODEL);
 Options.skoFrame1 = randn(2,Options.N_MODEL);
-% Options.skoFrame2 = randn(2,Options.N_MODEL);
+Options.skoFrame2 = randn(2,Options.N_MODEL);
 %%
-[Y_mas, x2_mas, error] = FramePoint_and_EKF(fi123_mas, Options, FramePoint_mas, myX_mas, Point_estim, POINT_RPY3_mas);
+[Y_mas, x2_mas, error, normQ, normX2] = FramePoint_and_EKF(fi123_mas, Options, FramePoint_mas, myX_mas, Point_estim, POINT_RPY3_mas);
+
+
 % %% Error
 % error_XYZ(3*i-2:3*i, 1:Options.N_MODEL) = error;
 % 
@@ -84,6 +86,10 @@ plot(Y_mas(1,:), Y_mas(2,:), '-*');
 xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 
+figure
+plot(Y_mas(3,:), Y_mas(4,:), '-*');
+xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 
 t=1:Options.N_MODEL;          %all observations
 l=t/Options.F_frame; 

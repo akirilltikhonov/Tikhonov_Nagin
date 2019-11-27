@@ -1,43 +1,60 @@
-function [Point_estim] = Point_estim_correct(Point_estim,Xcam,Options,Y)
+function [Point_estim] = Point_estim_correct(Point_estim,Xcam,Options,Y_1,Y_2)
 
 ENU2RPY = q2mat(Point_estim.filter.x2_extr);        %transfer vector state (quaternion) to rotation matrix
 
-% Xrpy(1)
-Point_estim.filter.a = ENU2RPY(1)*(Options.PointZ1_RTK(1)-Xcam(1));
-Point_estim.filter.b = ENU2RPY(4)*(Options.PointZ1_RTK(2)-Xcam(2));
-Point_estim.filter.c = ENU2RPY(7)*(Options.PointZ1_RTK(3)-Xcam(3));
-X1RPY = (Point_estim.filter.a+Point_estim.filter.b+Point_estim.filter.c);
+%% Special points 1 and 2 hit into camera lens
+if (Options.phantomZ1==1 && Options.phantomZ2==1)
+% 1 Matrix of partial derivative and coordinates in RPY of special point 1     
+[dS1dX2, Xrpy1] = dSdX(Options.PointZ1_RTK, Xcam, ENU2RPY, Point_estim);
+%predicted frame coordinates special point 1
+predicted_FramePoint1(1:2,1) = Point_estim.camera.Cam_F/Xrpy1(3)*[Xrpy1(1); Xrpy1(2)];
 
-% Xrpy(2)
-Point_estim.filter.d = ENU2RPY(2)*(Options.PointZ1_RTK(1)-Xcam(1));
-Point_estim.filter.e = ENU2RPY(5)*(Options.PointZ1_RTK(2)-Xcam(2));
-Point_estim.filter.f = ENU2RPY(8)*(Options.PointZ1_RTK(3)-Xcam(3));
-X2RPY = (Point_estim.filter.d+Point_estim.filter.e+Point_estim.filter.f);
+% 2 Matrix of partial derivative and coordinates in RPY of special point 2    
+[dS2dX2, Xrpy2] = dSdX(Options.PointZ2_RTK, Xcam, ENU2RPY, Point_estim);
+%predicted frame coordinates special point 2
+predicted_FramePoint2(1:2,1) = Point_estim.camera.Cam_F/Xrpy2(3)*[Xrpy2(1); Xrpy2(2)];
 
-% Xrpy(3)
-Point_estim.filter.g = ENU2RPY(3)*(Options.PointZ1_RTK(1)-Xcam(1));
-Point_estim.filter.h = ENU2RPY(6)*(Options.PointZ1_RTK(2)-Xcam(2));
-Point_estim.filter.i = ENU2RPY(9)*(Options.PointZ1_RTK(3)-Xcam(3));
-X3RPY = (Point_estim.filter.g+Point_estim.filter.h+Point_estim.filter.i);
 
-%% vector Xrpy derirative of vector state X2 (q)
-dCdQ = dQ2MATxAdQ(Point_estim.filter.x2_extr,Options.PointZ1_RTK);
+% Matrix of partial derivative, predicted frame coordinates and variance matrix of observations on a two-dimensional (camera) image if special points 1 and 2 hit into camera lens
+Point_estim.filter.dSdX2 = [dS1dX2; dS2dX2];
+predicted_FramePoint = [predicted_FramePoint1; predicted_FramePoint2];
+Y2 = [Y_1;Y_2];
+Point_estim.filter.Dn2 = Point_estim.filter.sko_Frame_Meas^2*diag([1,1,1,1]);
 
-%% Matrix of partial derivative
-Point_estim.filter.dSdX = Point_estim.camera.Cam_F/(X3RPY)^2*[dCdQ(1,1)*X3RPY-dCdQ(3,1)*X1RPY dCdQ(1,2)*X3RPY-dCdQ(3,2)*X1RPY dCdQ(1,3)*X3RPY-dCdQ(3,3)*X1RPY dCdQ(1,4)*X3RPY-dCdQ(3,4)*X1RPY; dCdQ(2,1)*X3RPY-dCdQ(3,1)*X2RPY dCdQ(2,2)*X3RPY-dCdQ(3,2)*X2RPY dCdQ(2,3)*X3RPY-dCdQ(3,3)*X2RPY dCdQ(2,4)*X3RPY-dCdQ(3,4)*X2RPY];
+%% Only special points 1 hit into camera lens
+elseif (Options.phantomZ1==1 && Options.phantomZ2==0)
+%% 1 Matrix of partial derivative and coordinates in RPY of special point 1     
+[dS1dX2, Xrpy1] = dSdX(Options.PointZ1_RTK, Xcam, ENU2RPY, Point_estim);
+%predicted frame coordinates special point 1
+predicted_FramePoint1(1:2,1) = Point_estim.camera.Cam_F/Xrpy1(3)*[Xrpy1(1); Xrpy1(2)];
+
+% Matrix of partial derivative, predicted frame coordinates and variance matrix of observations on a two-dimensional (camera) image if special points 1 and 2 hit into camera lens
+Point_estim.filter.dSdX2 = dS1dX2;
+predicted_FramePoint = predicted_FramePoint1;
+Y2 = Y_1;
+Point_estim.filter.Dn2 = Point_estim.filter.sko_Frame_Meas^2*diag([1,1]);
+
+else (Options.phantomZ1==0 && Options.phantomZ2==1)
+%% 2 Matrix of partial derivative and coordinates in RPY of special point 2    
+[dS2dX2, Xrpy2] = dSdX(Options.PointZ2_RTK, Xcam, ENU2RPY, Point_estim);
+%predicted frame coordinates special point 2
+predicted_FramePoint2(1:2,1) = Point_estim.camera.Cam_F/Xrpy2(3)*[Xrpy2(1); Xrpy2(2)];
+
+
+% Matrix of partial derivative, predicted frame coordinates and variance matrix of observations on a two-dimensional (camera) image if special points 1 and 2 hit into camera lens
+Point_estim.filter.dSdX2 = dS2dX2;
+predicted_FramePoint = predicted_FramePoint2;
+Y2 = Y_2;
+Point_estim.filter.Dn2 = Point_estim.filter.sko_Frame_Meas^2*diag([1,1]);
+end
 
 %% Kalman filter coefficient
-Point_estim.filter.K = Point_estim.filter.Dx2_extr*Point_estim.filter.dSdX'*inv(Point_estim.filter.dSdX*Point_estim.filter.Dx2_extr*Point_estim.filter.dSdX'+Point_estim.filter.Dn);
+Point_estim.filter.K = Point_estim.filter.Dx2_extr*Point_estim.filter.dSdX2'*inv(Point_estim.filter.dSdX2*Point_estim.filter.Dx2_extr*Point_estim.filter.dSdX2' + Point_estim.filter.Dn2);
 
-%% 
-Xrpy = ENU2RPY*(Options.PointZ1_RTK - Xcam);
-%predicted special point coordinates in RPY
-predicted_FramePoint(1:2,1) = Point_estim.camera.Cam_F/Xrpy(3)*[Xrpy(1); Xrpy(2)];
-%predicted frame coordinates special point
-Point_estim.filter.x2 = Point_estim.filter.x2_extr + Point_estim.filter.K*(Y - predicted_FramePoint);
-%new estimate coordinates special point in ENU
+%% New estimate of state vector X2 (quaternion)
+Point_estim.filter.x2 = Point_estim.filter.x2_extr + Point_estim.filter.K*(Y2 - predicted_FramePoint);
 
 %% Variance error of new estimate coordinates in ENU
 I=eye(4);       %
-Point_estim.filter.Dx2 = (I-Point_estim.filter.K*Point_estim.filter.dSdX)*Point_estim.filter.Dx2_extr;
+Point_estim.filter.Dx2 = (I-Point_estim.filter.K*Point_estim.filter.dSdX2)*Point_estim.filter.Dx2_extr;
 return
