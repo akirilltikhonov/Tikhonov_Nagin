@@ -49,11 +49,12 @@ amount = 20;
 %%
 
 % seed(i) = rng();
+
 RTK = randn(3,N_MODEL);
 skoFrame = randn(2,N_MODEL);
 
 %%
-% Point_estim = Point_estim_init(2,Vku,F_frame);      % установка начального приближения для фильтра    
+
 [Frame_Point_mas, xoc_mas, error, error1] = FramePoint_and_EKF(ENU2RPY_with_error_mas, POINT_RPY3_mas,FramePoint_mas, myX_mas, PointZ, sko_Coordinate_Meas, Point_estim, N_MODEL, T, RTK, skoFrame);
 
 % %% Error
@@ -63,9 +64,9 @@ skoFrame = randn(2,N_MODEL);
 % error_Y(i,1:N_MODEL) = error(2,:);
 % error_Z(i,1:N_MODEL) = error(3,:);
 % end
-
+% 
 % save('seed.mat', 'seed');       % save 'seed' random realizations of noise RTK and skoFrame
-
+% 
 % for j = 1:1:N_MODEL
 % %% RMSE on X, Y, Z for every time of simulation for 'amount' realizations
 % %expected value = 0
@@ -129,6 +130,16 @@ grid on
 title('Зависимость ошибки оценивания координат камеры от времени')
 ylim([min(error1(:))-1 max(error1(:))+1])
 
+% %% X coordinate
+% figure
+% plot(l,error_X)
+% legend ('Ошибка по координате X для N прогонов')
+% xlabel('Время,с')
+% ylabel('Ошибка оценивания,м')
+% grid on
+% title('Зависимость ошибки оценивания координат особой точки от времени')
+% ylim([min(error_X(:))-1 max(error_X(:))+1])
+% 
 % %% Y coordinate
 % figure
 % plot(l,error_Y)
@@ -158,5 +169,5 @@ ylim([min(error1(:))-1 max(error1(:))+1])
 % grid on
 % title('Зависимость СКОш координат особой точки от времени')
 % ylim([min(error_XYZ_RMSE(:))-1 max(error_XYZ_RMSE(:))+1])
-
+% 
 
