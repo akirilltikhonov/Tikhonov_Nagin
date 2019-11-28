@@ -14,8 +14,8 @@ Point_estim.filter.sko_Frame_Meas =10*Point_estim.camera.L/480;
 %variance matrix of observations on a two-dimensional (camera) image
 
 %Dx2
-Point_estim.filter.x2 = [0; 1; 0; 0];                   %a priori/starting state vector (quaternion camera orientation). 0 1 0 0 - camera rotate +180, 0, 0 deg relative X,Y,Z
-Point_estim.filter.initial_uncertainty_sko_x2 = 1;     %initial_uncertainty
+Point_estim.filter.x2 = [1; 0; 0; 0];                   %a priori/starting state vector (quaternion camera orientation). 0 1 0 0 - camera rotate +180, 0, 0 deg relative X,Y,Z
+Point_estim.filter.initial_uncertainty_sko_x2 = 0.01;     %initial_uncertainty
 Point_estim.filter.Dx2 = (Point_estim.filter.initial_uncertainty_sko_x2)^2*diag([1,1,1,1]);
 %variance matrix of the estimation vector state
 

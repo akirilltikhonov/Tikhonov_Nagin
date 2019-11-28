@@ -59,8 +59,13 @@ Options.skoFrame2 = randn(2,Options.N_MODEL);
 
 %% Camera Movement: 
 %% without RTK solution
-figure; plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:)); hold on; plot3(Options.PointZ1(1),Options.PointZ1(2),Options.PointZ1(3),'*'); hold on; plot3(myX_mas(1,1), myX_mas(2,1),myX_mas(3,1) ,'*');
-hold on; arrow3([myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)], [myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)+2]);
+figure; 
+plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:)); hold on; 
+plot3(Options.PointZ1(1),Options.PointZ1(2),Options.PointZ1(3),'*'); hold on; 
+plot3(Options.PointZ2(1),Options.PointZ2(2),Options.PointZ2(3),'*'); hold on; 
+plot3(myX_mas(1,1), myX_mas(2,1),myX_mas(3,1) ,'*'); hold on; 
+arrow3([myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)], [myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)+2]);
+
 text (myX_mas(1,1), myX_mas(2,1), myX_mas(3,1), '  Камера');
 text (Options.PointZ1(1),Options.PointZ1(2),Options.PointZ1(3), '  Особая точка');
 grid on
