@@ -5,10 +5,10 @@ for k = 1:N_MODEL
 tt = k*T;
 
 %% Coordinates of camera with RTK solution
-Xcam = myX_mas(:,k) + RTK(:,k)*sko_Coordinate_Meas;
+Xcam = myX_mas(:,k) + 1*RTK(:,k)*sko_Coordinate_Meas;
 
 %% Pinhole camera model
-Y = FramePoint_mas(:,k) + skoFrame(:,k)*Point_estim.filter.sko_Frame_Meas; % measurements - frame coordinates with noise
+Y = FramePoint_mas(:,k) + 1*skoFrame(:,k)*Point_estim.filter.sko_Frame_Meas; % measurements - frame coordinates with noise
 
 %% Observation vector
 Y1 = [Y; Xcam];
@@ -20,7 +20,7 @@ Point_estim = Point_estim_extrap(Point_estim);
 %% Correction
 % if special point hit into camera lens => correction stage
 if (abs(FramePoint_mas(1,k))<Point_estim.camera.L/2) && (abs(FramePoint_mas(2,k))<Point_estim.camera.L/2) && (POINT_RPY3_mas(:,k)>0)
-    [Point_estim] = Point_estim_correct(Point_estim,Xcam,ENU2RPY_with_error_mas,Y1,k);
+    [Point_estim] = Point_estim_correct(Point_estim,ENU2RPY_with_error_mas,Y1,k);
     phantom = 0;
 
 % else / if special point don't hit into camera lens => accept extrapolation values 

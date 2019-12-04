@@ -1,4 +1,4 @@
-function [Point_estim] = Point_estim_correct(Point_estim,Xcam,ENU2RPY_with_error_mas,Y1,k);
+function [Point_estim] = Point_estim_correct(Point_estim,ENU2RPY_with_error_mas,Y1,k);
 ENU2RPY = eye(3);
 ENU2RPY = ENU2RPY_with_error_mas(:,3*k-2:3*k);
 % Xrpy(1)
