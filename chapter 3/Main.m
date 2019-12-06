@@ -20,7 +20,7 @@ N_MODEL = ceil(MODEL_TIME_SEC/T);   % number of observations
 sko_Coordinate_Meas = 0.05;         % RTK solution
 wVu = 0.5;              % radial frequency
 Vku = 2;                % max velocity
-PointZ = [0;1;15];       % true point coordinates in ENU frame
+PointZ = [0;1;5];       % true point coordinates in ENU frame
 ENU2RPY = eye(3);       % rotation matrix RPY to ENU
 RPY2ENU = ENU2RPY';     % rotation matrix ENU to RPY
 
@@ -30,7 +30,7 @@ Point_estim = Point_estim_init(2,Vku,F_frame,sko_Coordinate_Meas);
 %% Camera rotation and framepoint
 Tturn=3;                % period of turn
 Ufi1deg = 0;            % amplitude of turn (deg) relative to X
-Ufi2deg = 10;           % amplitude of turn (deg) relative to Y
+Ufi2deg = 0;           % amplitude of turn (deg) relative to Y
 Ufi3deg = 60;            % amplitude of turn (deg) relative to Z
 
 %% ENU2RPY error   
@@ -42,7 +42,7 @@ error_deg = 1;          % by the end of simulation time error wiil be "error_deg
 
 
 %% FramePoint (Y) and EKF
-amount = 20;
+% amount = 20;
 
 % for i = 1:1:amount
 % 
@@ -57,7 +57,7 @@ skoFrame = randn(2,N_MODEL);
 
 [Frame_Point_mas, xoc_mas, error, error1] = FramePoint_and_EKF(ENU2RPY_with_error_mas, POINT_RPY3_mas,FramePoint_mas, myX_mas, PointZ, sko_Coordinate_Meas, Point_estim, N_MODEL, T, RTK, skoFrame);
 
-%% Error
+% %% Error
 % error_XYZ(3*i-2:3*i, 1:N_MODEL) = error;
 % 
 % error_X(i,1:N_MODEL) = error(1,:);
@@ -88,7 +88,7 @@ skoFrame = randn(2,N_MODEL);
 % error_CAM_RMSE = [error_CAM1_RMSE; error_CAM2_RMSE; error_CAM3_RMSE];
 % 
 % end
-
+% 
 % %% Camera Movement: 
 % %% without RTK solution
 % figure; plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:)); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); hold on; plot3(myX_mas(1,1), myX_mas(2,1),myX_mas(3,1) ,'*');
@@ -213,7 +213,7 @@ ylim([min(error1(:))-1 max(error1(:))+1])
 % grid on
 % title('Зависимость СКОш координат особой точки от времени')
 % ylim([min(error_XYZ_RMSE(:))-1 max(error_XYZ_RMSE(:))+1])
-% 
+% % 
 % %% All 3 camera's coordinates RMSE 
 % figure
 % plot(l,error_CAM_RMSE)

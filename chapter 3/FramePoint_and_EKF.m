@@ -26,7 +26,7 @@ if (abs(FramePoint_mas(1,k))<Point_estim.camera.L/2) && (abs(FramePoint_mas(2,k)
 % else / if special point don't hit into camera lens => accept extrapolation values 
 % as a priori/starting coordinates special point and variance matrix of the estimation vector state
 else
-    Point_estim.filter.x1 = Point_estim.filter.x1_extr;
+    Point_estim.filter.x1 = [Point_estim.filter.x1_extr(1:3); Xcam];
     Point_estim.filter.Dx1 = Point_estim.filter.Dx1_extr; 
     phantom = 1;
 end 
