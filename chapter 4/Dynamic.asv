@@ -57,11 +57,11 @@ myA = [-Options.Vku*Options.wVu*sin(Options.wVu*tt); -Options.Vku*Options.wVu*co
 myX_mas(:,k) = myX;     % all points camera position
 
  %% FramePoints without skoFrame
-%  for i = 1:1:Options.Number_Z
-%     POINT_RPY(3*i-2:3*i) = ENU2RPY*(Options.PointZ(3*i-2:3*i)-myX);
-%     POINT_RPY3_mas(i,k) = POINT_RPY(3*i);
-%     FramePoint_mas(2*i-1:2*i,k) = Point_estim.camera.Cam_F/POINT_RPY(3*i)*[POINT_RPY(3*i-2); POINT_RPY(3*i-1)];
-%  end
+ for i = 1:1:Options.Number_Z
+    POINT_RPY(3*i-2:3*i) = ENU2RPY*(Options.PointZ(3*i-2:3*i)-myX);
+    POINT_RPY3_mas(i,k) = POINT_RPY(3*i);
+    FramePoint(3*i-1:2*i,k) = Point_estim.camera.Cam_F/POINT_RPY1(3)*[POINT_RPY1(1); POINT_RPY1(2)];
+ end
  
  
 POINT_RPY1 = ENU2RPY*(Options.PointZ1-myX);        % coordinates of special point 1 in RPY
