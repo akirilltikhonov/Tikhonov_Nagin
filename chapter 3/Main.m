@@ -30,8 +30,8 @@ Point_estim = Point_estim_init(2,Vku,F_frame,sko_Coordinate_Meas);
 %% Camera rotation and framepoint
 Tturn=3;                % period of turn
 Ufi1deg = 0;            % amplitude of turn (deg) relative to X
-Ufi2deg = 0;           % amplitude of turn (deg) relative to Y
-Ufi3deg = 60;            % amplitude of turn (deg) relative to Z
+Ufi2deg = 60;           % amplitude of turn (deg) relative to Y
+Ufi3deg = 60;           % amplitude of turn (deg) relative to Z
 
 %% ENU2RPY error   
 error_deg = 1;          % by the end of simulation time error wiil be "error_deg" deg
@@ -42,13 +42,13 @@ error_deg = 1;          % by the end of simulation time error wiil be "error_deg
 
 
 %% FramePoint (Y) and EKF
-% amount = 20;
+amount = 100;
 
-% for i = 1:1:amount
-% 
-% %%
-% 
-% seed(i) = rng();
+for i = 1:1:amount
+
+%%
+
+seed(i) = rng();
 
 RTK = randn(3,N_MODEL);
 skoFrame = randn(2,N_MODEL);
@@ -57,48 +57,49 @@ skoFrame = randn(2,N_MODEL);
 
 [Frame_Point_mas, xoc_mas, error, error1] = FramePoint_and_EKF(ENU2RPY_with_error_mas, POINT_RPY3_mas,FramePoint_mas, myX_mas, PointZ, sko_Coordinate_Meas, Point_estim, N_MODEL, T, RTK, skoFrame);
 
-% %% Error
-% error_XYZ(3*i-2:3*i, 1:N_MODEL) = error;
-% 
-% error_X(i,1:N_MODEL) = error(1,:);
-% error_Y(i,1:N_MODEL) = error(2,:);
-% error_Z(i,1:N_MODEL) = error(3,:);
-% 
-% error_CAM(3*i-2:3*i, 1:N_MODEL) = error1;
-% error_CAM1(i,1:N_MODEL) = error_CAM(1,:);
-% error_CAM2(i,1:N_MODEL) = error_CAM(2,:);
-% error_CAM3(i,1:N_MODEL) = error_CAM(3,:);
-% end
-% 
-% save('seed.mat', 'seed');       % save 'seed' random realizations of noise RTK and skoFrame
-% 
-% for j = 1:1:N_MODEL
-% %% RMSE on X, Y, Z for every time of simulation for 'amount' realizations
-% %expected value = 0
-% error_X_RMSE(j:N_MODEL) = sqrt((sum(error_X(:,j).^2)/(amount-1)));
-% error_Y_RMSE(j:N_MODEL) = sqrt((sum(error_Y(:,j).^2)/(amount-1)));
-% error_Z_RMSE(j:N_MODEL) = sqrt((sum(error_Z(:,j).^2)/(amount-1)));
-% 
-% error_XYZ_RMSE = [error_X_RMSE; error_Y_RMSE; error_Z_RMSE];
-% 
-% error_CAM1_RMSE(j:N_MODEL) = sqrt((sum(error_CAM1(:,j).^2)/(amount-1)));
-% error_CAM2_RMSE(j:N_MODEL) = sqrt((sum(error_CAM2(:,j).^2)/(amount-1)));
-% error_CAM3_RMSE(j:N_MODEL) = sqrt((sum(error_CAM3(:,j).^2)/(amount-1)));
-% 
-% error_CAM_RMSE = [error_CAM1_RMSE; error_CAM2_RMSE; error_CAM3_RMSE];
-% 
-% end
-% 
-% %% Camera Movement: 
-% %% without RTK solution
-% figure; plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:)); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); hold on; plot3(myX_mas(1,1), myX_mas(2,1),myX_mas(3,1) ,'*');
-% hold on; arrow3([myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)], [myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)+2]);
-% text (myX_mas(1,1), myX_mas(2,1), myX_mas(3,1), '  Камера');
-% text (PointZ(1),PointZ(2),PointZ(3), '  Особая точка');
-% grid on
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
+%% Error
+error_XYZ(3*i-2:3*i, 1:N_MODEL) = error;
+
+error_X(i,1:N_MODEL) = error(1,:);
+error_Y(i,1:N_MODEL) = error(2,:);
+error_Z(i,1:N_MODEL) = error(3,:);
+
+error_CAM(3*i-2:3*i, 1:N_MODEL) = error1;
+
+error_CAM1(i,1:N_MODEL) = error1(1,:);
+error_CAM2(i,1:N_MODEL) = error1(2,:);
+error_CAM3(i,1:N_MODEL) = error1(3,:);
+end
+
+save('seed.mat', 'seed');       % save 'seed' random realizations of noise RTK and skoFrame
+
+for j = 1:1:N_MODEL
+%% RMSE on X, Y, Z for every time of simulation for 'amount' realizations
+%expected value = 0
+error_X_RMSE(j:N_MODEL) = sqrt((sum(error_X(:,j).^2)/(amount-1)));
+error_Y_RMSE(j:N_MODEL) = sqrt((sum(error_Y(:,j).^2)/(amount-1)));
+error_Z_RMSE(j:N_MODEL) = sqrt((sum(error_Z(:,j).^2)/(amount-1)));
+
+error_XYZ_RMSE = [error_X_RMSE; error_Y_RMSE; error_Z_RMSE];
+
+error_CAM1_RMSE(j:N_MODEL) = sqrt((sum(error_CAM1(:,j).^2)/(amount-1)));
+error_CAM2_RMSE(j:N_MODEL) = sqrt((sum(error_CAM2(:,j).^2)/(amount-1)));
+error_CAM3_RMSE(j:N_MODEL) = sqrt((sum(error_CAM3(:,j).^2)/(amount-1)));
+
+error_CAM_RMSE = [error_CAM1_RMSE; error_CAM2_RMSE; error_CAM3_RMSE];
+
+end
+
+%% Camera Movement: 
+%% without RTK solution
+figure; plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:)); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); hold on; plot3(myX_mas(1,1), myX_mas(2,1),myX_mas(3,1) ,'*');
+hold on; arrow3([myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)], [myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)+2]);
+text (myX_mas(1,1), myX_mas(2,1), myX_mas(3,1), '  Камера');
+text (PointZ(1),PointZ(2),PointZ(3), '  Особая точка');
+grid on
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
 
 % %% with RTK solution
 % figure; plot3(Xcam_mas(1,:), Xcam_mas(2,:),Xcam_mas(3,:) ); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); grid on
@@ -122,25 +123,25 @@ ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
 t=1:N_MODEL;          %all observations
 l=t/F_frame; 
 
-%% error X,Y,Z coordinates
-figure
-plot(l,error)
-legend ('Ошибка по координате X','Y','Z')
-xlabel('Время,с')
-ylabel('Ошибка оценивания,м')
-grid on
-title('Зависимость ошибки оценивания координат особой точки от времени')
-ylim([min(error(:))-1 max(error(:))+1])
+% %% error X,Y,Z coordinates
+% figure
+% plot(l,error)
+% legend ('Ошибка по координате X','Y','Z')
+% xlabel('Время,с')
+% ylabel('Ошибка оценивания,м')
+% grid on
+% title('Зависимость ошибки оценивания координат особой точки от времени')
+% ylim([min(error(:))-1 max(error(:))+1])
  
-%% error Xcam coordinates
-figure
-plot(l,error1)
-legend ('Ошибка по координате Xcam(1)','Xcam(2)', 'Xcam(3)')
-xlabel('Время,с')
-ylabel('Ошибка оценивания,м')
-grid on
-title('Зависимость ошибки оценивания координат камеры от времени')
-ylim([min(error1(:))-1 max(error1(:))+1])
+% %% error Xcam coordinates
+% figure
+% plot(l,error1)
+% legend ('Ошибка по координате Xcam(1)','Xcam(2)', 'Xcam(3)')
+% xlabel('Время,с')
+% ylabel('Ошибка оценивания,м')
+% grid on
+% title('Зависимость ошибки оценивания координат камеры от времени')
+% ylim([min(error1(:))-1 max(error1(:))+1])
 
 % %% X coordinate
 % figure
@@ -202,24 +203,24 @@ ylim([min(error1(:))-1 max(error1(:))+1])
 % grid on
 % title('Зависимость ошибки оценивания координат камеры от времени')
 % ylim([min(error_CAM3(:))-1 max(error_CAM3(:))+1])
+
+
+%% All 3 coordinates RMSE 
+figure
+plot(l,error_XYZ_RMSE)
+legend ('СКОш по X для каждого момента времени для N реализаций', 'СКОш по Y для каждого момента времени для N реализаций', 'СКОш по Z для каждого момента времени для N реализаций')
+xlabel('Время,с')
+ylabel('СКОш, м')
+grid on
+title('Зависимость СКОш координат особой точки от времени')
+ylim([min(error_XYZ_RMSE(:))-1 max(error_XYZ_RMSE(:))+1])
 % 
-% 
-% %% All 3 coordinates RMSE 
-% figure
-% plot(l,error_XYZ_RMSE)
-% legend ('СКОш по X для каждого момента времени для N реализаций', 'СКОш по Y для каждого момента времени для N реализаций', 'СКОш по Z для каждого момента времени для N реализаций')
-% xlabel('Время,с')
-% ylabel('СКОш, м')
-% grid on
-% title('Зависимость СКОш координат особой точки от времени')
-% ylim([min(error_XYZ_RMSE(:))-1 max(error_XYZ_RMSE(:))+1])
-% % 
-% %% All 3 camera's coordinates RMSE 
-% figure
-% plot(l,error_CAM_RMSE)
-% legend ('СКОш по CAM1 для каждого момента времени для N реализаций', 'СКОш по CAM2 для каждого момента времени для N реализаций', 'СКОш по CAM3 для каждого момента времени для N реализаций')
-% xlabel('Время,с')
-% ylabel('СКОш, м')
-% grid on
-% title('Зависимость СКОш координат камеры от времени')
-% ylim([min(error_CAM_RMSE(:))-1 max(error_CAM_RMSE(:))+1])
+%% All 3 camera's coordinates RMSE 
+figure
+plot(l,error_CAM_RMSE)
+legend ('СКОш по CAM1 для каждого момента времени для N реализаций', 'СКОш по CAM2 для каждого момента времени для N реализаций', 'СКОш по CAM3 для каждого момента времени для N реализаций')
+xlabel('Время,с')
+ylabel('СКОш, м')
+grid on
+title('Зависимость СКОш координат камеры от времени')
+ylim([min(error_CAM_RMSE(:))-1 max(error_CAM_RMSE(:))+1])

@@ -8,12 +8,12 @@ Point_estim.filter.sko_Frame_Meas =10*Point_estim.camera.L/480;
 %size/Npixels
 
 %% filter init
-%Dn
+%Dn1
 Point_estim.filter.Dn1 = diag([Point_estim.filter.sko_Frame_Meas,Point_estim.filter.sko_Frame_Meas, sko_Coordinate_Meas, sko_Coordinate_Meas, sko_Coordinate_Meas]).^2;
 %observation vector noise variance matrix
 
-%Dksi
-Point_estim.filter.ksi_sko_xoc = 0.05;                 %RMS of forming noise of special point's coordinates
+%Dksi1
+Point_estim.filter.ksi_sko_xoc = 0.01;                 %RMS of forming noise of special point's coordinates
 Point_estim.filter.ksi_sko_xcam = 1*Vku/F_frame;     %RMS of forming noise of camera's coordinates
 Point_estim.filter.Dksi1 = diag([Point_estim.filter.ksi_sko_xoc,Point_estim.filter.ksi_sko_xoc,Point_estim.filter.ksi_sko_xoc, Point_estim.filter.ksi_sko_xcam,Point_estim.filter.ksi_sko_xcam,Point_estim.filter.ksi_sko_xcam]).^2;
 % model dinamic noise variance matrix
