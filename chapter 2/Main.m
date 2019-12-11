@@ -12,7 +12,7 @@ close all
 clc
 
 %% MAIN OPTIONS
-MODEL_TIME_SEC = 200;   % observation time
+MODEL_TIME_SEC = 100;   % observation time
 F_frame = 24;           % frames per second
 T = 1/F_frame;          % frame duration
 N_MODEL = ceil(MODEL_TIME_SEC/T);   % number of observations
