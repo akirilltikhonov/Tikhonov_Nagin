@@ -23,7 +23,7 @@ Options.RPY2ENU = Options.ENU2RPY';     % rotation matrix ENU to RPY
 
 
 %% Camera rotation and framepoint
-Options.Tturn=60;                % period of turn
+Options.Tturn=3;                % period of turn
 Options.Ufi1deg = 0;            % amplitude of turn (deg) relative to X
 Options.Ufi2deg = 0;            % amplitude of turn (deg) relative to Y
 Options.Ufi3deg = 0;           % amplitude of turn (deg) relative to Z

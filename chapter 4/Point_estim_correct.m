@@ -102,7 +102,7 @@ Point_estim.filter.K = Point_estim.filter.Dx2_extr*Point_estim.filter.dSdX2'*inv
 
 %% New estimate of state vector X2 (quaternion)
 Point_estim.filter.x2 = Point_estim.filter.x2_extr + Point_estim.filter.K*(Y2 - predicted_FramePoint);
-
+%Point_estim.filter.x2 = Point_estim.filter.x2/sqrt((Point_estim.filter.x2(1))^2 + (Point_estim.filter.x2(2))^2 + (Point_estim.filter.x2(3))^2 + (Point_estim.filter.x2(4))^2);
 %% Variance error of new estimate coordinates in ENU
 I=eye(4);       %
 Point_estim.filter.Dx2 = (I-Point_estim.filter.K*Point_estim.filter.dSdX2)*Point_estim.filter.Dx2_extr;
