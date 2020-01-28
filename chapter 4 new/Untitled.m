@@ -26,9 +26,14 @@ clear
 % 
 % length(find(phantomZ==true))
 
-Q = [0.9 0.8 0 0]';
-Q = Q/norm(Q);
-R = rad2deg(q2rotv(Q))
+% Q = [0.9 0.8 0 0]';
+% Q = Q/norm(Q);
+% R = rad2deg(q2rotv(Q))
+
+a = [1; 0; 1; 1;];
+~a
+all(~a)
+
 
 
 

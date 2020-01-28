@@ -1,10 +1,13 @@
-function [Point_estim] = Point_estim_correct(Point_estim,Xcam,Options,Y2)
+function [Point_estim] = Point_estim_correct(Point_estim,Xcam,Options,Y2,k)
 
 ENU2RPY = q2mat(Point_estim.filter.x2_extr);        %transfer vector state (quaternion) to rotation matrix
+
+% ENU2RPY = Options.ENU2RPY(1:3,3*k-2:3*k);
 
 %% What special points hit into camera lens?
 flag = 0;   % marker which indicated that no one special point don't hit into camera lens
 for N = 1:1:Options.Number_Z
+       
     if (Options.phantomZ(N)==1 && N==1 && flag==0)  % special point N=1 hit into camera lens
         
         [dSndX2, Xrpy_N] = dSdX(Options.PointsZ_RTK(3*N-2:3*N), Xcam, ENU2RPY, Point_estim);        % partial derivative and coordinates in RPY of special point N=1
@@ -47,8 +50,18 @@ Point_estim.filter.Dn2 = Point_estim.filter.sko_Frame_Meas^2*diag([1:2*n]);
 Point_estim.filter.K = Point_estim.filter.Dx2_extr*Point_estim.filter.dSdX2'*inv(Point_estim.filter.dSdX2*Point_estim.filter.Dx2_extr*Point_estim.filter.dSdX2' + Point_estim.filter.Dn2);
 
 %% New estimate of state vector X2 (quaternion)
+Point_estim.Nevyzka = Y2_obs - predicted_FramePoint;
 Point_estim.filter.x2 = Point_estim.filter.x2_extr + Point_estim.filter.K*(Y2_obs - predicted_FramePoint);
-%Point_estim.filter.x2 = Point_estim.filter.x2/norm(Point_estim.filter.x2);
+
+% if (norm(Point_estim.filter.x2)~=1)
+%     Point_estim.filter.x2 = Point_estim.filter.x2/norm(Point_estim.filter.x2);
+% end
+
+if ((abs(Point_estim.filter.x2(1)) - 1.0) >= 100*eps)
+    Point_estim.filter.x2 = Point_estim.filter.x2/norm(Point_estim.filter.x2);
+end
+
+
 %% Variance error of new estimate coordinates in ENU
 I=eye(4);       %
 Point_estim.filter.Dx2 = (I-Point_estim.filter.K*Point_estim.filter.dSdX2)*Point_estim.filter.Dx2_extr;

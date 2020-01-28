@@ -1,4 +1,4 @@
-function [fi123_mas, myX_mas, POINT_RPY3_mas, FramePoint_mas] = Dynamic(Options,Point_estim)
+function [fi123_mas, myX_mas, POINT_RPY3_mas, FramePoint_mas, Options] = Dynamic(Options,Point_estim)
 
 for k = 1:Options.N_MODEL  
 tt = k*Options.T;
@@ -16,12 +16,15 @@ fi3 = Ufi3*sin(tt*(2*pi/Options.Tturn));    % angle of turn
 fi123 = [fi1; fi2; fi3];                    % vector angles of turn
 fi123_mas(:,k) = fi123;
 
-ENU2RPY1 = [1 0 0; 0 cos(fi1) sin(fi1); 0 -sin(fi1) cos(fi1)]; % X
-ENU2RPY2 = [cos(fi2) 0 -sin(fi2); 0 1 0; sin(fi2) 0 cos(fi2)]; % Y
-ENU2RPY3 = [cos(fi3) sin(fi3) 0; -sin(fi3) cos(fi3) 0; 0 0 1]; % Z
+% ENU2RPY1 = [1 0 0; 0 cos(fi1) sin(fi1); 0 -sin(fi1) cos(fi1)]; % X
+% ENU2RPY2 = [cos(fi2) 0 -sin(fi2); 0 1 0; sin(fi2) 0 cos(fi2)]; % Y
+% ENU2RPY3 = [cos(fi3) sin(fi3) 0; -sin(fi3) cos(fi3) 0; 0 0 1]; % Z
 
-ENU2RPY = ENU2RPY3*ENU2RPY2*ENU2RPY1; % rotation matrix
+%ENU2RPY = ENU2RPY3*ENU2RPY2*ENU2RPY1; % rotation matrix
 
+ENU2RPY = rpy2mat(fi123);
+
+% Options.ENU2RPY(1:3,3*k-2:3*k)=ENU2RPY;
 %% Camera dynamic
 myX = [Options.Vku*1/Options.wVu*sin(Options.wVu*tt); Options.Vku*1/Options.wVu*cos(Options.wVu*tt); 0];    % coordinates
 %myV = [Options.Vku*cos(Options.wVu*tt); -Options.Vku*sin(Options.wVu*tt); 0];                              % velocity

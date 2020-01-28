@@ -1,4 +1,4 @@
-function [Y2_mas, x2_mas, error, normQ, normX2] = FramePoint_and_EKF(fi123_mas, Options, FramePoint_mas, myX_mas, Point_estim, POINT_RPY3_mas)
+function [Y2_mas, x2_mas, error, normX2, Nevyzka] = FramePoint_and_EKF(fi123_mas, Options, FramePoint_mas, myX_mas, Point_estim, POINT_RPY3_mas)
 
 for k = 1:1:Options.N_MODEL  
 tt = k*Options.T;
@@ -26,7 +26,7 @@ end
 
 %% if at least one special point hit into camera lens => correction stage
 if (any(Options.phantomZ))
-    [Point_estim] = Point_estim_correct(Point_estim,Xcam,Options,Y2);
+    [Point_estim] = Point_estim_correct(Point_estim,Xcam,Options,Y2,k);
 
 % else no one special points don't hit into camera lens => accept extrapolation values 
 % as a priori/starting coordinates special point and variance matrix of the estimation vector state
@@ -38,19 +38,18 @@ end
 %% save for plot
     Y2_mas(:,k) = Y2;
 for M = 1:1:Options.Number_Z
-    
-    if Options.phantomZ(M) == 0
-        Y2(2*M-1:2*M,k) = nan; % don't building phantom points
+    if (Options.phantomZ(M) == 0)
+        Y2_mas(2*M-1:2*M,k) = nan; % don't building phantom points
     end
 end
    
     
 % Results
-x2_mas(:,k) = q2rotv(Point_estim.filter.x2);            
-error(:,k) = rad2deg(q2rotv(Point_estim.filter.x2) - fi123_mas(:,k)); 
+x2_mas(:,k) = q2rpy(Point_estim.filter.x2);            
 
-Q = rotv2q(fi123_mas(:,k));
-normQ (:,k) = norm(Q);
+error(:,k) = rad2deg(q2rpy(Point_estim.filter.x2) - fi123_mas(:,k));
 
 normX2 (:,k) = norm(Point_estim.filter.x2);
+
+Nevyzka(:,k)= Point_estim.Nevyzka;
 end
