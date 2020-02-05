@@ -10,6 +10,7 @@ clear all
 close all
 clc
 
+addpath('Additionally');
 %% MAIN OPTIONS
 [Options] = Main_options();
 
@@ -23,9 +24,13 @@ Point_estim = Point_estim_init(2, Options);
 %% FramePoint (Y) and EKF
 amount = 5;
 for i = 1:1:amount
+%% for load seed
+load('seed');
+rng(seed(i));
+%% for new seed
+%seed(i) = rng();
 
-% seed(i) = rng();
-
+%%
 Options.RTKcam = 1*randn(3,Options.N_MODEL);
 Options.RTKpointsZ = 1*randn(3*Options.Number_Z,Options.N_MODEL);
 Options.skoFrames = 1*randn(2*Options.Number_Z,Options.N_MODEL);
@@ -39,10 +44,15 @@ error_RPY(3*i-2:3*i, 1:Options.N_MODEL) = error;
 error_R(i,1:Options.N_MODEL) = error(1,:);
 error_P(i,1:Options.N_MODEL) = error(2,:);
 error_Y(i,1:Options.N_MODEL) = error(3,:);
+
+%% Norm
+normX2_all(i, 1:Options.N_MODEL) = normX2;
 end
 
-% save('seed.mat', 'seed');       % save 'seed' random realizations of noise RTK and skoFrame
+%% for save new seed
+%save('seed.mat', 'seed');       % save 'seed' random realizations of noise RTK and skoFrame
 
+%%
 for j = 1:1:Options.N_MODEL
 %% RMSE on Roll, Pitch, Yaw for every time of simulation for 'amount' realizations
 %expected value = 0
@@ -69,7 +79,7 @@ title('Зависимость ошибки оценивания углов ориентации камеры от времени')
 
 %%
 figure
-plot(l,normX2)
+plot(l,normX2_all)
 legend ('Норма (кватерниона) вектора состояния X2')
 xlabel('Время,с')
 ylabel('Значение нормы')

@@ -53,9 +53,9 @@ Point_estim.filter.K = Point_estim.filter.Dx2_extr*Point_estim.filter.dSdX2'*inv
 Point_estim.Nevyzka = Y2_obs - predicted_FramePoint;
 Point_estim.filter.x2 = Point_estim.filter.x2_extr + Point_estim.filter.K*(Y2_obs - predicted_FramePoint);
 
-% if (norm(Point_estim.filter.x2)~=1)
-%     Point_estim.filter.x2 = Point_estim.filter.x2/norm(Point_estim.filter.x2);
-% end
+%if (norm(Point_estim.filter.x2)~=1)
+%    Point_estim.filter.x2 = Point_estim.filter.x2/norm(Point_estim.filter.x2);
+%end
 
 if ((abs(Point_estim.filter.x2(1)) - 1.0) >= 100*eps)
     Point_estim.filter.x2 = Point_estim.filter.x2/norm(Point_estim.filter.x2);
