@@ -41,20 +41,33 @@ for fname in images:
         Num = Num + 1
         continue
 
+# find matrix intrisinc parametrs, distortional coefficient, rotation matrix and transfer vector
 ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1],None,None)
 
+# save matrix intrisinc parametrs and distortional coefficient
+np.save('mtx', mtx)
+np.save('dist', dist)
 
-img = cv2.imread('15.jpg')
-h,  w = img.shape[:2]
-newcameramtx, roi=cv2.getOptimalNewCameraMatrix(mtx,dist,(w,h),1,(w,h))
 
+Num = 1
+images = glob.glob('photo before and after calibration\*-1.jpg')
+for fname in images:
 
-# undistort
-dst = cv2.undistort(img, mtx, dist, None, newcameramtx)
+    img = cv2.imread(fname)
 
-# crop the image
-x,y,w,h = roi
-dst = dst[y:y+h, x:x+w]
-cv2.imwrite('15cal.jpg',dst)
+    # Determine windth and height frame, formation new matrix
+    # of intrisinc parametrs and ROI for crop image   
+    h,  w = img.shape[:2]
+    newcameramtx, roi=cv2.getOptimalNewCameraMatrix(mtx,dist,(w,h),1,(w,h))
+    
+
+    # undistorted frame
+    dst = cv2.undistort(img, mtx, dist, None, newcameramtx)
+
+    # crop the image
+    x,y,w,h = roi
+    dst = dst[y:y+h, x:x+w]
+    cv2.imwrite('photo before and after calibration/({})-2.jpg'.format(Num),dst)
+    Num = Num + 1
   
 
