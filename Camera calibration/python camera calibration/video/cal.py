@@ -37,7 +37,7 @@ if __name__ == '__main__':
       # Determine windth and height frame, formation new matrix
       # of intrisinc parametrs and ROI for crop image
       #h,  w = img.shape[:2]     #(determine in beginning)
-      newcameramtx, roi=cv2.getOptimalNewCameraMatrix(mtx,dist,(w,h),1,(w,h))
+      newcameramtx, roi=cv2.getOptimalNewCameraMatrix(mtx,dist,(w,h),0,(w,h))
       
 
       # undistorted frame\image
