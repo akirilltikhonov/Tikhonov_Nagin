@@ -33,7 +33,6 @@ temp_array = []      # for save keypoints and numbers keypoints
 while True:
 
    ret, frame = cap.read()
-   print(FrameNumber)
 
    # condition for break cycle if it was last frame in video
    if ret == False:
