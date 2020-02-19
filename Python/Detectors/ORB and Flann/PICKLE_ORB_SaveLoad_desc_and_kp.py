@@ -11,7 +11,6 @@ def pickle_keypoints(keypoints, descriptors):
         i = i + 1
         temp_array.append(temp)
     return temp_array
-
 def unpickle_keypoints(array):
     keypoints = []
     descriptors = []
@@ -21,7 +20,6 @@ def unpickle_keypoints(array):
         keypoints.append(temp_feature)
         descriptors.append(temp_descriptor)
     return keypoints, np.array(descriptors)
-
 
 img = cv2.imread("query.jpg", cv2.IMREAD_GRAYSCALE)   #queryImage
 cv2.imshow("original", img)

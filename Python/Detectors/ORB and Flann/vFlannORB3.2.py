@@ -23,6 +23,28 @@ def unpickle_keypoints(array):
       descriptors.append(temp_descriptor)
    return keypoints, np.array(descriptors)
 
+# Functrions for save and load keypoints and numbers keypoints
+def pickle_keypoints_numbers(keypoints, numbers):
+   i = 0
+   temp_array = []
+   for point in keypoints:
+      temp = (point.pt, point.size, point.angle, point.response, point.octave,
+              point.class_id, numbers[i])
+      i = i + 1
+      temp_array.append(temp)
+   return temp_array
+def unpickle_keypoints_numbers(array):
+   keypoints = []
+   numbers = []
+   for point in array:
+      temp_feature = cv2.KeyPoint(x=point[0][0], y=point[0][1], _size=point[1], _angle=point[2], _response=point[3],
+                                  _octave=point[4], _class_id=point[5])
+      temp_number = point[6]
+      keypoints.append(temp_feature)
+      numbers.append(temp_number)
+   return keypoints, np.array(numbers)
+
+
 img1 = cv2.imread("query.jpg", cv2.IMREAD_GRAYSCALE)   #queryImage
 
 cap = cv2.VideoCapture('VID.mp4')                     #video frame
@@ -45,13 +67,17 @@ des1 = np.float32(des1)       # change format
 #
 # cv2.imshow("queryImage", img3)
 
-# Feature matching (FLANN)
+
+#Feature matching (FLANN)
 index_params = dict(algorithm=0, trees=5)
 search_params = dict()
 flann = cv2.FlannBasedMatcher(index_params, search_params)
 
+FrameNumber = 0      # number of frame
+temp_array = []      # for save keypoints and numbers keypoints
 while True:
    ret, frame = cap.read()
+
    # condition for break cycle if it was last frame in video
    if ret == False:
       break
@@ -70,6 +96,17 @@ while True:
       cv2.imshow("queryImage", img3)
       cv2.imshow("trainIdxImage", img4)
       cv2.imshow("img5", img5)
+
+      # FLANN doesn't work if less two keypoints are found. Therefore there are not keyponts to save
+      kp22 = []
+      num22 = []
+      # Store keypoints and numbers keypoints
+      temp = pickle_keypoints(kp22, num22)
+      temp_array.append(temp)
+
+      FrameNumber = FrameNumber + 1
+
+      cv2.waitKey(0)
       continue
 
    des2 = np.float32(des2)    # change format
@@ -82,21 +119,6 @@ while True:
    for m, n in matches:
       if m.distance < 0.55*n.distance:
          good_matches.append(m)
-   ##
-   # print(good_matches)
-   # if len(good_matches) == 1:
-   #    # print(len(good_matches))
-   #    print(good_matches[0].queryIdx)
-   # if len(good_matches) == 2:
-   #    print(good_matches[0].queryIdx)
-   #    print(good_matches[1].queryIdx)
-      # print(good_matches[0].trainIdx)
-      # print(good_matches[0].distance)
-      # print(kp1[good_matches[0].queryIdx])
-      # print(kp2[good_matches[0].trainIdx])
-      # print(kp1[good_matches[0].queryIdx].pt)
-      # print(kp2[good_matches[0].trainIdx].pt)
-   ##
 
    # Draw kepoints
    img5 = cv2.drawMatches(img1, kp1, img2, kp2, good_matches, img2)
@@ -126,11 +148,32 @@ while True:
    cv2.imshow("trainIdxImage", img4)
    cv2.imshow("img5", img5)
 
+   # Numbers keypoints
+   num22 = []
+   for p in range(0, len(good_matches)):
+      num22.append(good_matches[p].queryIdx)
+   num22 = np.array(num22)
+
+   print("\n")
+   print(kp22)
+   print(num22)
+
+   # Store keypoints and numbers keypoints
+   temp = pickle_keypoints(kp22, num22)
+   temp_array.append(temp)
+
+   FrameNumber = FrameNumber + 1
+
    # delay used to frame change
-   key = cv2.waitKey(0)
+   key = cv2.waitKey(1)
    # exit if user press 'esc'
    if key == 27:
       break
+
+print(FrameNumber)
+
+# Save
+pickle.dump(temp_array, open("keypoints_numbers_database.p", "wb"))
 
 cap.release()
 cv2.destroyAllWindows
