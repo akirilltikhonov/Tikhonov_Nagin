@@ -16,15 +16,16 @@ if __name__ == '__main__':
    # make object 'cap' to capture  video frame
    cap = cv2.VideoCapture('VID2.mp4')
 
-   # width, height and fps in video
+   # Width, height and fps in video
    w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH));
    h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT));
    fps = cap.get(cv2.CAP_PROP_FPS);
-        
+
+
    # Define the codec and create VideoWriter object
-   fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-   out = cv2.VideoWriter('VID2-1.mp4', fourcc, fps, (w, h))
-   
+   # fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+   # out = cv2.VideoWriter('VID2-1.mp4', fourcc, fps, (w, h))
+   #
    while True:
 
       # catch current frame and put it to variable 'img'
@@ -48,7 +49,7 @@ if __name__ == '__main__':
       #dst = dst[y:y+h, x:x+w]
 
       # write\save the undistorted frame
-      out.write(dst)
+      # out.write(dst)
    
       # display undistorted frame in window with name 'undistorted'
       cv2.imshow('undistorted', dst)
@@ -64,5 +65,5 @@ if __name__ == '__main__':
          break
 
    cap.release()
-   out.release()
+   # out.release()
    cv2.destroyAllWindows()
