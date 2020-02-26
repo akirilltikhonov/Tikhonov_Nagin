@@ -89,8 +89,8 @@ while True:
             kp11.append(kp1[mat.queryIdx])  # save founded old keypoints in queryImage
             kp22.append(kp2[mat.trainIdx])  # save founded old keypoints in trainImage
             des22[mat.trainIdx] = des2[mat.trainIdx]
-            # print(mat.queryIdx)
-            # print(mat.trainIdx)
+            print(mat.queryIdx)
+            print(mat.trainIdx)
 
          # print(des22.dtype)
 
@@ -107,7 +107,7 @@ while True:
             num1.append(good_matches[p].queryIdx)
 
          # For save
-         kp = kp1
+         kp = kp22
          num = np.array(num1)
          # print(kp)
          # print(num)
@@ -120,25 +120,18 @@ while True:
          kp22 = []
 
          for mat in good_matches:
+            kp1[mat.queryIdx] = kp2[mat.trainIdx]
             kp11.append(kp1[mat.queryIdx])  # save founded old keypoints in queryImage
             kp22.append(kp2[mat.trainIdx])  # save founded old keypoints in trainImage
-            des1 [mat.trainIdx] = des2[mat.trainIdx]
-            # print(mat.queryIdx)
-            # print(mat.trainIdx)
+            des1 [mat.queryIdx] = des2[mat.trainIdx]
+            kp
 
-         # Keypoints and descriptors in train image for next frame (for next query image)
-         kp1 = kp1
-         print(kp1)
-         des1 = np.float32(des1)
-         print(des1)
 
-         # For save
-         kp = kp22
-         num = num
-         # print(kp)
-         # print(num)
 
          orb = cv2.ORB_create(addKP)
+
+         kp2, des2 = orb.detectAndCompute(img2, None)
+         des2 = np.float32(des2)  # change format
 
 
 
