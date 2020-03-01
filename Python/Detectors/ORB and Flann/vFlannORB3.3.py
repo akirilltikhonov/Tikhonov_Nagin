@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import pickle
+from matplotlib import pyplot as plt
 
 # Functrions for save and load keypoints and numbers keypoints
 def pickle_keypoints_numbers(keypoints, numbers):
@@ -55,7 +56,9 @@ while True:
                   cv2.LINE_AA)
 
    # Show result
-   cv2.imshow("Keypoints", img1)
+   # cv2.imshow("Keypoints", img1)
+   plt.imshow(img1), plt.title('trainImage')
+   while not plt.waitforbuttonpress(): pass
 
    FrameNumber = FrameNumber + 1
 

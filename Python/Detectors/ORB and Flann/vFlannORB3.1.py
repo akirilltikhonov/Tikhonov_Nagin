@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import pickle
+from matplotlib import pyplot as plt
 
 # Functrions for save and load keypoints and descriptors
 def pickle_keypoints(keypoints, descriptors):
@@ -44,13 +45,15 @@ des1 = np.float32(des1)       # change format
 #    cv2.putText(img3, '{}'.format(p1 + 1), (int(kp1[p1].pt[0]), int(kp1[p1].pt[1])), font, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
 #
 # cv2.imshow("queryImage", img3)
-#
+# plt.figure(),plt.imshow(img3),plt.title('queryImage')
+# plt.show()
 
 # Feature matching (FLANN)
 index_params = dict(algorithm=0, trees=5)
-search_params = dict()
+search_params = dict(checks=100)
 flann = cv2.FlannBasedMatcher(index_params, search_params)
 FrameNumber = 0
+
 while True:
    ret, frame = cap.read()
    # condition for break cycle if it was last frame in video
@@ -62,7 +65,7 @@ while True:
    kp2, des2= orb.detectAndCompute(img2, None)
 
    # Condition for pass all operations and go to next iteration cycle if less two keypoints are found (because in "knnMatch" k=2 below)
-   if len(kp2) <= 1:
+   if len(kp2) < 2:
       # Draw and line matches
       img5 = cv2.drawMatches(img1, kp1, img2, kp2, good_matches, img2)
       # Draw keypoints
@@ -70,9 +73,12 @@ while True:
 
       # Show result
       cv2.imshow("queryImage", img3)
-      cv2.imshow("trainIdxImage", img4)
-      cv2.imshow("img5", img5)
+      cv2.imshow("trainImage", img4)
+      cv2.imshow("drawMatches", img5)
 
+      cv2.waitKey(0)
+
+      # Frame counter
       FrameNumber = FrameNumber + 1
       continue
 
@@ -128,9 +134,13 @@ while True:
 
    # Show result
    cv2.imshow("queryImage", img3)
-   cv2.imshow("trainIdxImage", img4)
-   cv2.imshow("img5", img5)
+   # cv2.imshow("trainImage", img4)
+   cv2.imshow("drawMatches", img5)
 
+   plt.imshow(img4), plt.title('trainImage')
+   while not plt.waitforbuttonpress(): pass
+
+   # Frame counter
    FrameNumber = FrameNumber + 1
 
    # delay used to frame change
