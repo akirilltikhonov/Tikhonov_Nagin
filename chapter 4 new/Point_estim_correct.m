@@ -1,4 +1,4 @@
-function [Point_estim] = Point_estim_correct(Point_estim,Xcam,Options,Y2,k)
+function [Point_estim] = Point_estim_correct(Point_estim,Xcam,Options,Y2)
 
 ENU2RPY = q2mat(Point_estim.filter.x2_extr);        %transfer vector state (quaternion) to rotation matrix
 
@@ -50,17 +50,12 @@ Point_estim.filter.Dn2 = Point_estim.filter.sko_Frame_Meas^2*diag([1:2*n]);
 Point_estim.filter.K = Point_estim.filter.Dx2_extr*Point_estim.filter.dSdX2'*inv(Point_estim.filter.dSdX2*Point_estim.filter.Dx2_extr*Point_estim.filter.dSdX2' + Point_estim.filter.Dn2);
 
 %% New estimate of state vector X2 (quaternion)
-Point_estim.Nevyzka = Y2_obs - predicted_FramePoint;
 Point_estim.filter.x2 = Point_estim.filter.x2_extr + Point_estim.filter.K*(Y2_obs - predicted_FramePoint);
 
-%if (norm(Point_estim.filter.x2)~=1)
-%    Point_estim.filter.x2 = Point_estim.filter.x2/norm(Point_estim.filter.x2);
-%end
-
+%% Normalization of quartenion
 if ((abs(Point_estim.filter.x2(1)) - 1.0) >= 100*eps)
     Point_estim.filter.x2 = Point_estim.filter.x2/norm(Point_estim.filter.x2);
 end
-
 
 %% Variance error of new estimate coordinates in ENU
 I=eye(4);       %

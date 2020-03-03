@@ -31,8 +31,7 @@ clear
 % R = rad2deg(q2rotv(Q))
 
 a = [1; 0; 1; 1;];
-~a
-all(~a)
+aa = a/2
 
 
 

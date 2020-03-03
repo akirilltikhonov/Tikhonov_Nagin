@@ -42,13 +42,13 @@ Options.RPY2ENU = Options.ENU2RPY';     % rotation matrix ENU to RPY
 
 
 %% Camera rotation and framepoint
-Options.Tturn=300;               % period of turn
-Options.Ufi1deg = 0;           % amplitude of turn (deg) relative to X (Roll)
-Options.Ufi2deg = 0;           % amplitude of turn (deg) relative to Y (Pitch)
-Options.Ufi3deg = 10;           % amplitude of turn (deg) relative to Z (Yaw)
+Options.Tturn = 300;               % period of turn
+Options.Ufi1deg = 10;           % amplitude of turn (deg) relative to X (Roll)
+Options.Ufi2deg = 10;           % amplitude of turn (deg) relative to Y (Pitch)
+Options.Ufi3deg = 0;           % amplitude of turn (deg) relative to Z (Yaw)
 
 %% ENU2RPY error   
-Options.error_deg = 0;          % by the end of simulation time error wiil be "error_deg" deg
+Options.error_deg = 0;          % by the end of simulation time error will be "error_deg" deg
 
 return
 

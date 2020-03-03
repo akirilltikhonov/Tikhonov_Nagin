@@ -14,13 +14,14 @@ addpath('Additionally');
 %% MAIN OPTIONS
 [Options] = Main_options();
 
+
 %% FILTER AND CAMERA INITIALIZATION
 Point_estim = Point_estim_init(2, Options);
 
 %% MAIN ALGORITHM
 %% Camera dynamic
 [fi123_mas, myX_mas, POINT_RPY3_mas, FramePoint_mas, Options] = Dynamic(Options,Point_estim);
-
+fi123_mas_deg = rad2deg(fi123_mas);
 %% FramePoint (Y) and EKF
 amount = 5;
 for i = 1:1:amount
@@ -36,8 +37,9 @@ Options.RTKpointsZ = 1*randn(3*Options.Number_Z,Options.N_MODEL);
 Options.skoFrames = 1*randn(2*Options.Number_Z,Options.N_MODEL);
 
 %%
-[Y2_mas, x2_mas, error, normX2, Nevyzka] = FramePoint_and_EKF(fi123_mas, Options, FramePoint_mas, myX_mas, Point_estim, POINT_RPY3_mas);
+[Y2_mas, x2_mas, error, normX2] = FramePoint_and_EKF(fi123_mas, Options, FramePoint_mas, myX_mas, Point_estim, POINT_RPY3_mas);
 
+x2_mas_deg(3*i-2:3*i,1:Options.N_MODEL) = rad2deg(x2_mas);
 %% Error
 error_RPY(3*i-2:3*i, 1:Options.N_MODEL) = error;
 
@@ -86,16 +88,6 @@ ylabel('Значение нормы')
 grid on
 title('Зависимость нормы (кватерниона) вектора состояния X2 от времени')
 % ylim([min(normX2(:))-1 max(normX2(:))+1])
-
-%% Nevyzka
-figure
-plot(l,Nevyzka)
-legend ('Nevyzka')
-xlabel('Время,с')
-ylabel('Nevyzka')
-grid on
-title('Nevyzka')
-% ylim([min(Nevyzka(:)-0.1) max(Nevyzka(:))+0.1])
 
 
 %% Camera Movement: 
