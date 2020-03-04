@@ -14,7 +14,6 @@ addpath('Additionally');
 %% MAIN OPTIONS
 [Options] = Main_options();
 
-
 %% FILTER AND CAMERA INITIALIZATION
 Point_estim = Point_estim_init(2, Options);
 
@@ -91,32 +90,32 @@ title('Зависимость нормы (кватерниона) вектора состояния X2 от времени')
 
 
 %% Camera Movement: 
-% % without RTK solution
-% figure;
-% G = 1;
-% while (G <= Options.Number_Z)
-% plot3(Options.PointsZ(3*G-2),Options.PointsZ(3*G-1),Options.PointsZ(3*G),'*'); hold on; 
-% %text (Options.PointsZ(3*G-2),Options.PointsZ(3*G-1),Options.PointsZ(3*G), 'Особая точка ');
-% G = G + 1;
-% end
-% plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:));
-% plot3(myX_mas(1,1), myX_mas(2,1),myX_mas(3,1) ,'*');
-% text (myX_mas(1,1), myX_mas(2,1), myX_mas(3,1), '  Камера');
-% arrow3([myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)], [myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)+2]);
-% grid on
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
+% without RTK solution
+figure;
+G = 1;
+while (G <= Options.Number_Z)
+plot3(Options.PointsZ(3*G-2),Options.PointsZ(3*G-1),Options.PointsZ(3*G),'*'); hold on; 
+text (0, -1, 25, 'Особые точки');
+G = G + 1;
+end
+plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:));
+plot3(myX_mas(1,1), myX_mas(2,1),myX_mas(3,1));
+text (myX_mas(1,1), myX_mas(2,1), myX_mas(3,1), '  Камера');
+arrow3([myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)], [myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)+2]);
+grid on
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
 %  
 %% Trajectory point on the screen
-% F = 1;
-% while(F <= Options.Number_Z)
-% figure
-% plot(Y2_mas(2*F-1,:), Y2_mas(2*F,:), '-*');
-% xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
-% ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
-% F = F + 1;
-% end
+F = 1;
+while(F <= Options.Number_Z)
+figure
+plot(Y2_mas(2*F-1,:), Y2_mas(2*F,:), '-*');
+xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+F = F + 1;
+end
 
 %% 
 %% Roll angle
