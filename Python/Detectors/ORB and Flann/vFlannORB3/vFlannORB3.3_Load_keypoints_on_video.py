@@ -98,14 +98,15 @@ while True:
 
 
    # Show result
-   # cv2.imshow("Keypoints", img1)
-   plt.imshow(img1), plt.title('trainImage')
-   while not plt.waitforbuttonpress(): pass
+   cv2.imshow("Keypoints", img1)
+   # plt.imshow(img1), plt.title('trainImage')
+   # while not plt.waitforbuttonpress(): pass
 
    FrameNumber = FrameNumber + 1
 
    # delay used to frame change
-   key = cv2.waitKey(1)
+   key = cv2.waitKey(0)
+
    # exit if user press 'esc'
    if key == 27:
       break

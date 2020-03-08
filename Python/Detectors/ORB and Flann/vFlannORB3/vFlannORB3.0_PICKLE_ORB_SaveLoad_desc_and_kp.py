@@ -25,17 +25,9 @@ def unpickle_keypoints(array):
 
 img = cv2.imread("query.jpg", cv2.IMREAD_GRAYSCALE)   #queryImage
 
-# Mask for search keypoints only in pixel where there are value '255'
-dist_pix = 2        # Minumal distance beetwen pixels/keypoints
-mask = np.zeros((img.shape[0], img.shape[1]), dtype=np.uint8)
-for i in range(0, img.shape[0], dist_pix+1):
-   for j in range(0, img.shape[1], dist_pix+1):
-      mask[i,j] = 255
-print(mask)
-
-
 # Features
-orb = cv2.ORB_create(nfeatures = 50,
+orb = cv2.ORB_create(
+                     nfeatures = 1,
                      scaleFactor = 1.2,     # Standart 1.2
                      nlevels = 1,           # Standart 8 --- keypoints not so close 1
                      edgeThreshold = 31,
@@ -56,14 +48,41 @@ orb = cv2.ORB_create(nfeatures = 50,
 # patchSize	- size of the patch used by the oriented BRIEF descriptor. Of course, on smaller pyramid layers the perceived image area covered by a feature will be larger.
 # fastThreshold	- the fast threshold
 
-# Find descriptors and keypoints
-kp1, des1 = orb.detectAndCompute(img, mask)
+
+# Initialization of mask (255 - search keypoints, 0 - don't search keypoints)
+mask = np.full((img.shape[0], img.shape[1]), 255, dtype=np.uint8)
+
+amountKP = 100      # amount keypoints that we need to find
+dist_kp = 8        # distance beetwen keypoints (min dist_kp = 1)
+kp1 = []
+
+while len(kp1) < amountKP:
+
+    # Find descriptors and keypoints using a mask
+    kp, des = orb.detectAndCompute(img, mask)
+    des = np.float32(des)
+
+    print(len(kp))
+
+    # Correction of mask (255 - search keypoints, 0 - don't search keypoints)
+    mask[int(kp[0].pt[1])-dist_kp : int(kp[0].pt[1])+dist_kp, int(kp[0].pt[0])-dist_kp : int(kp[0].pt[0])+dist_kp] = 0
+
+    # Write keypoints and descriptors that are not so close
+
+    if len(kp1) == 0:
+        des1 = des
+    else:
+        des1 = np.append(des1, des, axis=0)
+
+    kp1.append(kp[0])
+    # kp1 = np.append(kp1, kp, axis=0)
+
+
 
 # Draw founded keypoints
 img1 = cv2.drawKeypoints(img, kp1, img)
 
 print(len(kp1))
-print(len(des1))
 
 
 #Store keypoint features
@@ -72,17 +91,10 @@ temp = pickle_keypoints(kp1, des1)
 temp_array.append(temp)
 pickle.dump(temp_array, open("keypoints_database.p", "wb"))
 
-
 # Retrieve Keypoint Features
 keypoints_database = pickle.load(open("keypoints_database.p", "rb"))
 kp2, des2 = unpickle_keypoints(keypoints_database[0])
 
-# print(des1)
-# print('\n')
-# print(des2)
-#
-# print(kp1)
-# print(kp2)
 
 # Draw loaded keypoints
 img2 = cv2.drawKeypoints(img, kp2, img)
