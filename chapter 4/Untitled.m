@@ -1,50 +1,39 @@
-clear 
 clc
+clear
 
-A1_deg = 0;
-A2_deg = 0;
-A3_deg = 180;
 
-%%
-A1 = deg2rad(A1_deg);
-A2 = deg2rad(A2_deg);
-A3 = deg2rad(A3_deg);
-A123=[A1;A2;A3];
+% Y2 = [1 2 3 4 5]';
+% phantomZ = [true true true true true]';
+% 
+% 
+% Number_Z = 5;
+% flag = 0;
+% 
+% for N = 1:1:Number_Z
+%     if (phantomZ(N)==1 && N==1 && flag==0)
+%         Y2_obs = Y2(N);
+%         flag = 1;
+%         
+%     elseif (phantomZ(N)==1 && N~=1 && flag==0)
+%         Y2_obs = Y2(N);
+%         flag = 1;
+%         
+%     elseif (phantomZ(N)==1 && flag==1)
+%          Y2_obs = [Y2_obs; Y2(N)];
+%          
+%     end      
+% end
+% 
+% length(find(phantomZ==true))
 
-A = sqrt(A1^2 + A2^2 + A3^2);
-a1 = cos(A/2);
-a2 = (A1/A)*sin(A/2);
-a3 = (A2/A)*sin(A/2);
-a4 = (A3/A)*sin(A/2);
-a = [a1 a2 a3 a4]'
-% 
-% %
-% BB = rand(1,1);
-% BB_SKO1 = 0.09;
-% BB_SKO = sqrt(BB_SKO1^2 + BB_SKO1^2 + BB_SKO1^2);
-% 
-% B1_deg = BB*BB_SKO1;
-% B2_deg = BB*BB_SKO1;
-% B3_deg = BB*BB_SKO1;
-% 
-% B1 = deg2rad(B1_deg);
-% B2 = deg2rad(B2_deg);
-% B3 = deg2rad(B3_deg);
-% B = sqrt(B1^2 + B2^2 + B3^2);
-% 
-% 
-% 
-% b1 = cos(B/2);
-% b2 = (B1/B)*sin(B/2);
-% b3 = (B2/B)*sin(B/2);
-% b4 = (B3/B)*sin(B/2);
-% b = [b1;b2;b3;b4]
-% ab = [a1*b1-a2*b2-a3*b3-a4*b4; a2*b1+a1*b2-a4*b3+a3*b4; a3*b1+a4*b2+a1*b3-a2*b4; a4*b1-a3*b2+a2*b3+a1*b4]
-% 
-% 
-% c1 = deg2rad(BB*BB_SKO);
-% c2 =deg2rad(BB*BB_SKO1);
-% c3 = deg2rad(BB*BB_SKO1);
-% c4 = deg2rad(BB*BB_SKO1);
-% c = [c1; c2; c3; c4];
-% a_plus_c = a+c
+% Q = [0.9 0.8 0 0]';
+% Q = Q/norm(Q);
+% R = rad2deg(q2rotv(Q))
+
+a = [1; 0; 1; 1;];
+aa = a/2
+
+
+
+
+    

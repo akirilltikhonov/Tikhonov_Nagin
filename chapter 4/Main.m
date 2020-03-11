@@ -1,175 +1,161 @@
 %%%%
-% point coordinates estimation
-% we know our ENU coordinates
-% we measure point position in video frame - Y1 , Y2
+% camera's orientation estimation
+% we know camera coorninetes and coordinates few special points in ENU with RTK error
+% we measure points position in video frame - Y1 , Y2
 % we know relationship X -> Y -> Y1,Y2
-% EKF:
-% X = [Zx Zy Zz]
-% Y = [Y1 Y2]
+% Use EKF and Estimate camera's orientation (quaternion) X2=q
+
 %%
 clear all
 close all
 clc
 
+addpath('Additionally');
 %% MAIN OPTIONS
 [Options] = Main_options();
 
-%% Filter and camera initialization
+%% FILTER AND CAMERA INITIALIZATION
 Point_estim = Point_estim_init(2, Options);
 
-%% Main algorithm
+%% MAIN ALGORITHM
 %% Camera dynamic
-[fi123_mas, myX_mas, POINT_RPY3_mas, FramePoint_mas] = Dynamic(Options,Point_estim);
-
-
+[fi123_mas, myX_mas, POINT_RPY3_mas, FramePoint_mas, Options] = Dynamic(Options,Point_estim);
+fi123_mas_deg = rad2deg(fi123_mas);
 %% FramePoint (Y) and EKF
-% % amount = 20;
-% % for i = 1:1:amount
-% 
-%%
-% seed(i) = rng();
-Options.RTKcam = randn(3,Options.N_MODEL);
-
-Options.RTKpointZ1 = randn(3,Options.N_MODEL);
-Options.RTKpointZ2 = randn(3,Options.N_MODEL);
-Options.RTKpointZ3 = randn(3,Options.N_MODEL);
-Options.RTKpointZ4 = randn(3,Options.N_MODEL);
-Options.RTKpointZ5 = randn(3,Options.N_MODEL);
-Options.RTKpointZ6 = randn(3,Options.N_MODEL);
-
-Options.skoFrame1 = randn(2,Options.N_MODEL);
-Options.skoFrame2 = randn(2,Options.N_MODEL);
-Options.skoFrame3 = randn(2,Options.N_MODEL);
-Options.skoFrame4 = randn(2,Options.N_MODEL);
-Options.skoFrame5 = randn(2,Options.N_MODEL);
-Options.skoFrame6 = randn(2,Options.N_MODEL);
+amount = 10;
+for i = 1:1:amount
+%% for load seed
+% load('seed');
+% rng(seed(i));
+%% for new seed
+%seed(i) = rng();
 
 %%
-[Y_mas, x2_mas, error, normQ, normX2] = FramePoint_and_EKF(fi123_mas, Options, FramePoint_mas, myX_mas, Point_estim, POINT_RPY3_mas);
+Options.RTKcam = 1*randn(3,Options.N_MODEL);
+Options.RTKpointsZ = 1*randn(3*Options.Number_Z,Options.N_MODEL);
+Options.ObvNoise = 1*randn(2*Options.Number_Z,Options.N_MODEL);
 
-% 
-% % %% Error
-% % error_XYZ(3*i-2:3*i, 1:Options.N_MODEL) = error;
-% % 
-% % error_X(i,1:Options.N_MODEL) = error(1,:);
-% % error_Y(i,1:Options.N_MODEL) = error(2,:);
-% % error_Z(i,1:Options.N_MODEL) = error(3,:);
-% % end
-% % 
-% % save('seed.mat', 'seed');       % save 'seed' random realizations of noise RTK and skoFrame
-% % 
-% % for j = 1:1:Options.N_MODEL
-% % %% RMSE on X, Y, Z for every time of simulation for 'amount' realizations
-% % %expected value = 0
-% % error_X_RMSE(j:Options.N_MODEL) = sqrt((sum(error_X(:,j).^2)/(amount-1)));
-% % error_Y_RMSE(j:Options.N_MODEL) = sqrt((sum(error_Y(:,j).^2)/(amount-1)));
-% % error_Z_RMSE(j:Options.N_MODEL) = sqrt((sum(error_Z(:,j).^2)/(amount-1)));
-% % 
-% % error_XYZ_RMSE = [error_X_RMSE; error_Y_RMSE; error_Z_RMSE];
-% % end
-% 
-% %% Camera Movement: 
-% %% without RTK solution
-% figure; 
-% plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:)); hold on; 
-% plot3(Options.PointZ1(1),Options.PointZ1(2),Options.PointZ1(3),'*'); hold on; 
-% plot3(Options.PointZ2(1),Options.PointZ2(2),Options.PointZ2(3),'*'); hold on;
-% plot3(Options.PointZ2(1),Options.PointZ2(2),Options.PointZ3(3),'*'); hold on;
-% plot3(Options.PointZ2(1),Options.PointZ2(2),Options.PointZ4(3),'*'); hold on;
-% plot3(Options.PointZ2(1),Options.PointZ2(2),Options.PointZ5(3),'*'); hold on;
-% plot3(Options.PointZ2(1),Options.PointZ2(2),Options.PointZ6(3),'*'); hold on;
-% plot3(myX_mas(1,1), myX_mas(2,1),myX_mas(3,1) ,'*'); hold on; 
-% arrow3([myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)], [myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)+2]);
-% 
-% text (myX_mas(1,1), myX_mas(2,1), myX_mas(3,1), '  Камера');
-% text (Options.PointZ1(1),Options.PointZ1(2),Options.PointZ1(3), '  Особая точка');
-% grid on
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
-% 
-% % %% with RTK solution
-% % figure; plot3(Xcam_mas(1,:), Xcam_mas(2,:),Xcam_mas(3,:) ); hold on; plot3(PointZ(1),PointZ(2),PointZ(3),'*'); grid on
-% % xlabel('X')
-% % ylabel('Y')
-% % zlabel('Z')
-% 
-%% Trajectory point on the screen
+%%
+[Y2_mas, x2_mas, error, normX2] = FramePoint_and_EKF(fi123_mas, Options, FramePoint_mas, myX_mas, Point_estim, POINT_RPY3_mas);
 
+x2_mas_deg(3*i-2:3*i,1:Options.N_MODEL) = rad2deg(x2_mas);
+%% Error
+error_RPY(3*i-2:3*i, 1:Options.N_MODEL) = error;
 
+error_R(i,1:Options.N_MODEL) = error(1,:);
+error_P(i,1:Options.N_MODEL) = error(2,:);
+error_Y(i,1:Options.N_MODEL) = error(3,:);
+
+%% Norm
+normX2_all(i, 1:Options.N_MODEL) = normX2;
+end
+
+%% for save new seed
+%save('seed.mat', 'seed');       % save 'seed' random realizations of noise RTK and skoFrame
+
+%%
+for j = 1:1:Options.N_MODEL
+%% RMSE on Roll, Pitch, Yaw for every time of simulation for 'amount' realizations
+%expected value = 0
+error_R_RMSE(j:Options.N_MODEL) = sqrt((sum(error_R(:,j).^2)/(amount-1)));
+error_P_RMSE(j:Options.N_MODEL) = sqrt((sum(error_P(:,j).^2)/(amount-1)));
+error_Y_RMSE(j:Options.N_MODEL) = sqrt((sum(error_Y(:,j).^2)/(amount-1)));
+
+error_RPY_RMSE = [error_R_RMSE; error_P_RMSE; error_Y_RMSE];
+end
+
+%%
 t=1:Options.N_MODEL;          %all observations
 l=t/Options.F_frame; 
 
-%% error state vector X2 coordinate
-figure
-plot(l,error)
-legend ('Ошибка по 3 углам ориентации')
-xlabel('Время,с')
-ylabel('Ошибка оценивания, град')
-grid on
-title('Зависимость ошибки оценивания углов ориентации камеры от времени')
-ylim([min(error(:))-1 max(error(:))+1])
+% %% error state vector X2 coordinate
+% figure
+% plot(l,error)
+% legend ('Ошибка по углу Roll', 'Ошибка по углу Pitch', 'Ошибка по углу Yaw')
+% xlabel('Время,с')
+% ylabel('Ошибка оценивания, град')
+% grid on
+% title('Зависимость ошибки оценивания углов ориентации камеры от времени')
+% % ylim([min(error(:))-1 max(error(:))+1])
 
-%% Quaternion norms
+%%
 figure
-plot(l,normQ)
-legend ('Норма кватерниона описывающего реальную ориентацию камеры')
-xlabel('Время,с')
-ylabel('Значение нормы')
-grid on
-title('Зависимость нормы кватерниона описывающего реальную ориентацию камеры от времени')
-ylim([min(normQ(:))-1 max(normQ(:))+1])
-
-figure
-plot(l,normX2)
+plot(l,normX2_all)
 legend ('Норма (кватерниона) вектора состояния X2')
 xlabel('Время,с')
 ylabel('Значение нормы')
 grid on
 title('Зависимость нормы (кватерниона) вектора состояния X2 от времени')
-ylim([min(normX2(:))-1 max(normX2(:))+1])
+% ylim([min(normX2(:))-1 max(normX2(:))+1])
 
+%% Camera Movement: 
+% without RTK solution
+figure;
+G = 1;
+while (G <= Options.Number_Z)
+plot3(Options.PointsZ(3*G-2),Options.PointsZ(3*G-1),Options.PointsZ(3*G),'*'); hold on; 
+text (3, -2, 10, 'Особые точки');
+G = G + 1;
+end
+plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:));
+plot3(myX_mas(1,1), myX_mas(2,1),myX_mas(3,1));
+text (myX_mas(1,1), myX_mas(2,1), myX_mas(3,1), '  Камера');
+arrow3([myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)], [myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)+2]);
+grid on
+xlabel('X, м')
+ylabel('Y, м')
+zlabel('Z, м')
+%  
 
+%% Trajectory point on the screen
+F = 1;
+a = 24*140
+b = 24*160
+while(F <= Options.Number_Z)
+figure
+plot(Y2_mas(2*F-1,a:b), Y2_mas(2*F,a:b), '-*');
+xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+F = F + 1;
+end
 
-% 
-% % %% X coordinate
-% % figure
-% % plot(l,error_X)
-% % legend ('Ошибка по координате X для N прогонов')
-% % xlabel('Время,с')
-% % ylabel('Ошибка оценивания,м')
-% % grid on
-% % title('Зависимость ошибки оценивания координат особой точки от времени')
-% % ylim([min(error_X(:))-1 max(error_X(:))+1])
-% % 
-% % %% Y coordinate
-% % figure
-% % plot(l,error_Y)
-% % legend ('Ошибка по координате Y для N прогонов')
-% % xlabel('Время,с')
-% % ylabel('Ошибка оценивания,м')
-% % grid on
-% % title('Зависимость ошибки оценивания координат особой точки от времени')
-% % ylim([min(error_Y(:))-1 max(error_Y(:))+1])
-% % 
-% % %% Z coordinate
-% % figure
-% % plot(l,error_Z)
-% % legend ('Ошибка по координате Z для N прогонов')
-% % xlabel('Время,с')
-% % ylabel('Ошибка оценивания,м')
-% % grid on
-% % title('Зависимость ошибки оценивания координат особой точки от времени')
-% % ylim([min(error_Z(:))-1 max(error_Z(:))+1])
-% % 
-% % %% All 3 coordinates RMSE 
-% % figure
-% % plot(l,error_XYZ_RMSE)
-% % legend ('СКОш по X для каждого момента времени для N реализаций', 'СКОш по Y для каждого момента времени для N реализаций', 'СКОш по Z для каждого момента времени для N реализаций')
-% % xlabel('Время,с')
-% % ylabel('СКОш, м')
-% % grid on
-% % title('Зависимость СКОш координат особой точки от времени')
-% % ylim([min(error_XYZ_RMSE(:))-1 max(error_XYZ_RMSE(:))+1])
-% % 
+%% 
+%% Roll angle
+figure
+plot(l,error_R)
+legend ('Ошибка по углу Roll для N прогонов')
+xlabel('Время, с')
+ylabel('Ошибка оценивания, град')
+grid on
+title('Зависимость ошибки оценивания угла Roll ориентации камеры от времени')
+% ylim([min(error_R(:))-1 max(error_R(:))+1])
 
+%% Pitch angle
+figure
+plot(l,error_P)
+legend ('Ошибка по углу Pitch для N прогонов')
+xlabel('Время, с')
+ylabel('Ошибка оценивания, град')
+grid on
+title('Зависимость ошибки оценивания угла Pitch ориентации камеры от времени')
+% ylim([min(error_P(:))-1 max(error_P(:))+1])
+
+%% Yaw angle
+figure
+plot(l,error_Y)
+legend ('Ошибка по углу Yaw для N прогонов')
+xlabel('Время, с')
+ylabel('Ошибка оценивания, град')
+grid on
+title('Зависимость ошибки оценивания Yaw ориентации камеры от времени')
+% ylim([min(error_Y(:))-1 max(error_Y(:))+1])
+
+%% All 3 angles RMSE 
+figure
+plot(l,error_RPY_RMSE)
+legend ('СКОш угла Roll для каждого момента времени для N реализаций', 'СКОш угла Pitch для каждого момента времени для N реализаций', 'СКОш угла Yaw для каждого момента времени для N реализаций')
+xlabel('Время,с')
+ylabel('СКОш, град')
+grid on
+title('Зависимость СКОш углов ориентации камеры от времени')
+% ylim([min(error_RPY_RMSE(:))-1 max(error_RPY_RMSE(:))+1])
