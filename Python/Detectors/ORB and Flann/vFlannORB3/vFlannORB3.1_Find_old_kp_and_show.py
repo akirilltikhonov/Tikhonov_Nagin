@@ -139,7 +139,7 @@ while True:
    for mat in good_matches:
       kp11.append(kp1[mat.queryIdx])  # save founded old keypoints in queryImage
       kp22.append(kp2[mat.trainIdx])  # save founded old keypoints in trainImage
-
+   
    # Draw keypoints
    img3 = cv2.drawKeypoints(img1, kp11, None, color=(0, 0, 255), flags=0)  # queryImage
    img4 = cv2.drawKeypoints(img2, kp22, None, color=(0, 0, 255), flags=0)  # trainImage
@@ -158,9 +158,11 @@ while True:
    cv2.imshow("trainImage", img4)
    cv2.imshow("drawMatches", img5)
 
-   # plt.figure(),plt.imshow(img5), plt.title('trainImage')
+
+   # plt.figure(),plt.imshow(img4), plt.title('trainImage')
    # while not plt.waitforbuttonpress(): pass
    # plt.close()
+
 
    # Frame counter
    FrameNumber = FrameNumber + 1

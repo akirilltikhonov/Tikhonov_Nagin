@@ -45,6 +45,16 @@ def unpickle_keypoints_numbers(array):
       numbers.append(temp_number)
    return keypoints, np.array(numbers)
 
+# Functrions for save numbers and X,Y coordinates of keypoints
+def pickle_number_X_Y_keypoints(numbers, keypoints):
+   i = 0
+   temp_array = []
+   for point in keypoints:
+      temp = (numbers[i], point.pt[0], point.pt[1])
+      i = i + 1
+      temp_array.append(temp)
+   return temp_array
+
 
 img1 = cv2.imread("query.jpg", cv2.IMREAD_GRAYSCALE)   #queryImage
 
@@ -112,6 +122,7 @@ flann = cv2.FlannBasedMatcher(index_params, search_params)
 
 FrameNumber = 0      # number of frame
 temp_array = []      # for save keypoints and numbers keypoints
+NumXY_frame = []     # for save numbers and X,Y coordinates of keypoints
 while True:
    ret, frame = cap.read()
 
@@ -139,13 +150,18 @@ while True:
       # FLANN doesn't work if less two keypoints are found. Therefore there are not keyponts to save
       kp22 = []
       num22 = []
-      # Store keypoints and numbers keypoints
+
+      # Store keypoints and numbers keypoints (for python)
       temp = pickle_keypoints(kp22, num22)
       temp_array.append(temp)
 
+      # Store numbers and X,Y coordinates of keypoints (for matlab)
+      NumXY = pickle_number_X_Y_keypoints(num22, kp22)
+      NumXY_frame.append(NumXY)
+
       FrameNumber = FrameNumber + 1
 
-      cv2.waitKey(0)
+      cv2.waitKey(1)
       continue
 
    des2 = np.float32(des2)    # change format
@@ -200,9 +216,13 @@ while True:
    print(kp22)
    print(num22)
 
-   # Store keypoints and numbers keypoints
-   temp = pickle_keypoints(kp22, num22)
+   # Store keypoints and numbers keypoints (for python)
+   temp = pickle_keypoints_numbers(kp22, num22)
    temp_array.append(temp)
+
+   # Store numbers and X,Y coordinates of keypoints (for matlab)
+   NumXY = pickle_number_X_Y_keypoints(num22, kp22)
+   NumXY_frame.append(NumXY)
 
    FrameNumber = FrameNumber + 1
 
@@ -215,8 +235,14 @@ while True:
 
 print(FrameNumber)
 
-# Save
+# Save for python
 pickle.dump(temp_array, open("keypoints_numbers_database.p", "wb"))
+
+# Save for matlab
+import scipy.io
+scipy.io.savemat('keypoints_numbers_database.mat', mdict={'NumXY_frame': NumXY_frame})
+
+
 
 cap.release()
 cv2.destroyAllWindows
