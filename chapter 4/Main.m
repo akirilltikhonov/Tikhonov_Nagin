@@ -36,7 +36,7 @@ Options.RTKpointsZ = 1*randn(3*Options.Number_Z,Options.N_MODEL);
 Options.ObvNoise = 1*randn(2*Options.Number_Z,Options.N_MODEL);
 
 %%
-[Y2_mas, x2_mas, error, normX2] = FramePoint_and_EKF(fi123_mas, Options, FramePoint_mas, myX_mas, Point_estim, POINT_RPY3_mas);
+[Y2_mas, x2_mas, error, normX2, npoints] = FramePoint_and_EKF(fi123_mas, Options, FramePoint_mas, myX_mas, Point_estim, POINT_RPY3_mas);
 
 x2_mas_deg(3*i-2:3*i,1:Options.N_MODEL) = rad2deg(x2_mas);
 %% Error
@@ -45,6 +45,7 @@ error_RPY(3*i-2:3*i, 1:Options.N_MODEL) = error;
 error_R(i,1:Options.N_MODEL) = error(1,:);
 error_P(i,1:Options.N_MODEL) = error(2,:);
 error_Y(i,1:Options.N_MODEL) = error(3,:);
+
 
 %% Norm
 normX2_all(i, 1:Options.N_MODEL) = normX2;
@@ -97,7 +98,9 @@ plot3(Options.PointsZ(3*G-2),Options.PointsZ(3*G-1),Options.PointsZ(3*G),'*'); h
 text (3, -2, 10, 'Особые точки');
 G = G + 1;
 end
-plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:));
+a = 45;
+b = 60;
+plot3(myX_mas(1,24*a:24*b), myX_mas(2,24*a:24*b),myX_mas(3,24*a:24*b));
 plot3(myX_mas(1,1), myX_mas(2,1),myX_mas(3,1));
 text (myX_mas(1,1), myX_mas(2,1), myX_mas(3,1), '  Камера');
 arrow3([myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)], [myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)+2]);
@@ -105,19 +108,16 @@ grid on
 xlabel('X, м')
 ylabel('Y, м')
 zlabel('Z, м')
-%  
 
-%% Trajectory point on the screen
-F = 1;
-a = 24*140
-b = 24*160
-while(F <= Options.Number_Z)
-figure
-plot(Y2_mas(2*F-1,a:b), Y2_mas(2*F,a:b), '-*');
-xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
-ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
-F = F + 1;
-end
+% %% Trajectory point on the screen
+% F = 1;
+% while(F <= Options.Number_Z)
+% figure
+% plot(Y2_mas(2*F-1,24*a:24*b), Y2_mas(2*F,24*a:24*b), '-*');
+% xlim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+% ylim([-Point_estim.camera.L/2,Point_estim.camera.L/2]);
+% F = F + 1;
+% end
 
 %% 
 %% Roll angle
@@ -159,3 +159,32 @@ ylabel('СКОш, град')
 grid on
 title('Зависимость СКОш углов ориентации камеры от времени')
 % ylim([min(error_RPY_RMSE(:))-1 max(error_RPY_RMSE(:))+1])
+
+%% Amount keypoints that hit into camera lens
+figure
+plot(l,npoints)
+% legend ('Количество особых точек попадаемых в объектив камеры')
+xlabel('Время, с')
+ylabel('Количество особых точек')
+grid on
+title('Количество особых точек попадаемых в объектив камеры')
+% ylim([min(error_R(:))-1 max(error_R(:))+1])
+
+%% X2
+figure
+plot(l,x2_mas_deg(1,:))
+xlabel('Время, с')
+ylabel('Угол поворота, град')
+grid on
+title('Оценка изменения угла поворота Roll')
+% ylim([min(error_R(:))-1 max(error_R(:))+1])
+
+%% X2
+figure
+plot(l,fi123_mas_deg(1,:))
+xlabel('Время, с')
+ylabel('Угол поворота, град')
+grid on
+title('Истинное изменения угла поворота Roll')
+% ylim([min(error_R(:))-1 max(error_R(:))+1])
+

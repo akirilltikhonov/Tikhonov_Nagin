@@ -1,4 +1,4 @@
-function [Point_estim] = Point_estim_correct(Point_estim,Xcam,Options,Y2)
+function [Point_estim, n] = Point_estim_correct(Point_estim,Xcam,Options,Y2)
 
 ENU2RPY = q2mat(Point_estim.filter.x2_extr);        %transfer vector state (quaternion) to rotation matrix
 
