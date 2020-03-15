@@ -46,11 +46,11 @@ def unpickle_keypoints_numbers(array):
    return keypoints, np.array(numbers)
 
 # Functrions for save numbers and X,Y coordinates of keypoints
-def pickle_number_X_Y_keypoints(numbers, keypoints):
+def pickle_number_X_Y_keypoints(keypoints, numbers):
    i = 0
    temp_array = []
    for point in keypoints:
-      temp = (numbers[i], point.pt[0], point.pt[1])
+      temp = (point.pt[0], point.pt[1], numbers[i])
       i = i + 1
       temp_array.append(temp)
    return temp_array
@@ -156,7 +156,7 @@ while True:
       temp_array.append(temp)
 
       # Store numbers and X,Y coordinates of keypoints (for matlab)
-      NumXY = pickle_number_X_Y_keypoints(num22, kp22)
+      NumXY = pickle_number_X_Y_keypoints(kp22, num22)
       NumXY_frame.append(NumXY)
 
       FrameNumber = FrameNumber + 1
@@ -221,7 +221,7 @@ while True:
    temp_array.append(temp)
 
    # Store numbers and X,Y coordinates of keypoints (for matlab)
-   NumXY = pickle_number_X_Y_keypoints(num22, kp22)
+   NumXY = pickle_number_X_Y_keypoints(kp22, num22)
    NumXY_frame.append(NumXY)
 
    FrameNumber = FrameNumber + 1
