@@ -147,10 +147,10 @@ while True:
    # Draw number of keypoints
    font = cv2.FONT_HERSHEY_SIMPLEX
    for p in range(0, len(good_matches)):
-      Num = good_matches[p].queryIdx
-      cv2.putText(img3, '{}'.format(Num + 1), (int(kp11[p].pt[0]), int(kp11[p].pt[1])), font, 0.5, (0, 0, 255), 1,
+      Num = good_matches[p].queryIdx+1
+      cv2.putText(img3, '{}'.format(Num), (int(kp11[p].pt[0]), int(kp11[p].pt[1])), font, 0.5, (0, 0, 255), 1,
                   cv2.LINE_AA)
-      cv2.putText(img4, '{}'.format(Num + 1), (int(kp22[p].pt[0]), int(kp22[p].pt[1])), font, 0.5, (0, 0, 255), 1,
+      cv2.putText(img4, '{}'.format(Num), (int(kp22[p].pt[0]), int(kp22[p].pt[1])), font, 0.5, (0, 0, 255), 1,
                   cv2.LINE_AA)
 
    # Show result
