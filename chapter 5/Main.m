@@ -42,7 +42,7 @@ for i = 1:Options.N_MODEL
         
         %% Save estimation X3 and Dx3
         Point_estim.filter.x3_xcam = Point_estim.filter.x3(1:3);
-        Point_estim.filter.x3_qcam = Point_estim.filter.x3(4:7);
+        Point_estim.filter.x3_qcam = Point_estim.filter.x3(4:7)
         
         diagDx3 = diag(Point_estim.filter.Dx3);
         Point_estim.filter.initial_uncertainty_dispersion_x3_xcam = diagDx3(1:3);

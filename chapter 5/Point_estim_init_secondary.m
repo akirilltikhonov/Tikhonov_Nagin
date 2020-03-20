@@ -7,14 +7,14 @@ for i = 1:Number_Z
     
     %% Starting\state vector X3_0\X3 with keypoits coordinates
     if isnan(Point_estim.filter.x3_xn_all(3*NumXY(i,3), 1))
-        Point_estim.filter.x3_xn_all(3*NumXY(i,3):3*NumXY(i,3)+2, 1) = [(2.5/Point_estim.camera.Cam_F)*[NumXY(1,1); NumXY(1,2)].*Point_estim.camera.koef_pixel2meters; 2.5];
+        Point_estim.filter.x3_xn_all(3*NumXY(i,3):3*NumXY(i,3)+2, 1) = [(3/Point_estim.camera.Cam_F)*[NumXY(1,1); NumXY(1,2)].*Point_estim.camera.koef_pixel2meters; 3];
     end
     
     x3_xn(3*i-2:3*i, 1) = Point_estim.filter.x3_xn_all(3*NumXY(i,3):3*NumXY(i,3)+2, 1);
     
     %% Vector uncertainty dispersion for diagonal Dx3
     if isnan (Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all(3*NumXY(i,3), 1))
-        Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all(3*NumXY(i,3):3*NumXY(i,3)+2, 1) = [Point_estim.filter.sko_pixels*Point_estim.camera.koef_pixel2meters; 1].^2;
+        Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all(3*NumXY(i,3):3*NumXY(i,3)+2, 1) = [Point_estim.filter.sko_pixels*Point_estim.camera.koef_pixel2meters; 1.5].^2;
     end
     
     initial_uncertainty_dispersion_x3_xn(3*i-2:3*i, 1) = Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all(3*NumXY(i,3):3*NumXY(i,3)+2, 1);
