@@ -27,10 +27,10 @@ Point_estim.filter.Dx2 = (Point_estim.filter.initial_uncertainty_sko_x2)^2*diag(
 %variance matrix of the estimation vector state
 
 %Dksi
-ksi = 0.00001;     % Optimal order = 6 -- Tturn=300--> min RMSE  
-                   % Optimal order = 5 -- Tturn=30--> min RMSE 
-                   % Optimal order = 4 -- Tturn=30--> min RMSE
-                   % less than 4 order - norm of quaternion feels not so good
+ksi = 0.0000001;  
+% Tturn = 200 -- ksi = 0.0000001
+% Tturn = 100 -- ksi = 0.000003
+
 
 Point_estim.filter.ksi_x2_sko =  ksi;
 Point_estim.filter.ksi1_x2_sko = ksi;

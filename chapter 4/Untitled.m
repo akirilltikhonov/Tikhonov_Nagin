@@ -30,9 +30,10 @@ clear
 % Q = Q/norm(Q);
 % R = rad2deg(q2rotv(Q))
 
-a = [1; 0; 1; 1;];
-aa = a/2
+% a = [1; 0; 1; 1;];
+% aa = a/2
 
+mod(380, 200)
 
 
 

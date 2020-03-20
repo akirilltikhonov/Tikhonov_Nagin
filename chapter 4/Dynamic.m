@@ -1,13 +1,12 @@
 function [fi123_mas, myX_mas, POINT_RPY3_mas, FramePoint_mas, Options] = Dynamic(Options,Point_estim)
-a = 1;
+
 for k = 1:Options.N_MODEL  
 tt = k*Options.T;
 
 %% Camera rotation
 Ufi1 = deg2rad(Options.Ufi1deg);            % amplitude of turn relative to X
 fi1 = Ufi1*sin(tt*(2*pi/Options.Tturn));    % angle of turn
-
-
+   
 Ufi2 = deg2rad(Options.Ufi2deg);            % amplitude of turn relative to Y
 fi2 = Ufi2*sin(tt*(2*pi/Options.Tturn));    % angle of turn
 

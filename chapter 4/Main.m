@@ -22,7 +22,7 @@ Point_estim = Point_estim_init(2, Options);
 [fi123_mas, myX_mas, POINT_RPY3_mas, FramePoint_mas, Options] = Dynamic(Options,Point_estim);
 fi123_mas_deg = rad2deg(fi123_mas);
 %% FramePoint (Y) and EKF
-amount = 10;
+amount = 5;
 for i = 1:1:amount
 %% for load seed
 % load('seed');
@@ -98,9 +98,8 @@ plot3(Options.PointsZ(3*G-2),Options.PointsZ(3*G-1),Options.PointsZ(3*G),'*'); h
 text (3, -2, 10, 'Особые точки');
 G = G + 1;
 end
-a = 45;
-b = 60;
-plot3(myX_mas(1,24*a:24*b), myX_mas(2,24*a:24*b),myX_mas(3,24*a:24*b));
+
+plot3(myX_mas(1,:), myX_mas(2,:),myX_mas(3,:));
 plot3(myX_mas(1,1), myX_mas(2,1),myX_mas(3,1));
 text (myX_mas(1,1), myX_mas(2,1), myX_mas(3,1), '  Камера');
 arrow3([myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)], [myX_mas(1,1) myX_mas(2,1) myX_mas(3,1)+2]);
@@ -172,7 +171,7 @@ title('Количество особых точек попадаемых в объектив камеры')
 
 %% X2
 figure
-plot(l,x2_mas_deg(1,:))
+plot(l,x2_mas_deg(:,:))
 xlabel('Время, с')
 ylabel('Угол поворота, град')
 grid on
