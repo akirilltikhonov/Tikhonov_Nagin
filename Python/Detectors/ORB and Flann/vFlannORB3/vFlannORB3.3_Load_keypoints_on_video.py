@@ -93,7 +93,7 @@ while True:
    for p in range(0, len(kp)):
       Num = num[p]
 
-      cv2.putText(img1, '{}'.format(Num + 1), (int(kp[p].pt[0]), int(kp[p].pt[1])), font, 0.5, (0, 0, 255), 1,
+      cv2.putText(img1, '{}'.format(Num), (int(kp[p].pt[0]), int(kp[p].pt[1])), font, 0.5, (0, 0, 255), 1,
                   cv2.LINE_AA)
 
 
