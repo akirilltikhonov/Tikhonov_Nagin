@@ -10,7 +10,7 @@ close all
 clc
 
 addpath('Additionally');
-load('keypoints_numbers_database.mat')      % load keypoints on each frame
+load('keypoints_numbers_database2.mat')      % load keypoints on each frame
 
 %% MAIN OPTIONS
 Options.N_MODEL = length(NumXY_frame);      % amount of frames
