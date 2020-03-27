@@ -3,14 +3,24 @@ import numpy as np
 import pickle
 from matplotlib import pyplot as plt
 
+# Functrions for save numbers and X,Y coordinates of keypoints
+def pickle_X_Y_coordinates_and_numbers(keypoints, numbers):
+   i = 0
+   temp_array = []
+   for point in keypoints:
+      temp = (point.pt[0], point.pt[1], numbers[i])
+      i = i + 1
+      temp_array.append(temp)
+   return temp_array
+
 # Load video
 cap = cv2.VideoCapture('VID.mp4')
 
 # amount keypoints which will be found
-amountKP = 5
+amountKP = 100
 
 # Turn on feature detector ORB
-orb = cv2.ORB_create(nfeatures = 50,
+orb = cv2.ORB_create(nfeatures = amountKP,
                      scaleFactor = 1.2,     # Standart 1.2
                      nlevels = 1,           # Standart 8 --- keypoints not so close 1
                      edgeThreshold = 31,
@@ -35,7 +45,13 @@ index_params = dict(algorithm=1, trees=5)
 search_params = dict(check=100)
 flann = cv2.FlannBasedMatcher(index_params, search_params)
 
+# Font for draw numbers keypoints
+font = cv2.FONT_HERSHEY_SIMPLEX
+
 FrameNumber = 0
+
+temp_array = []      # for save keypoints and numbers keypoints
+NumXY_frame = []     # for save numbers and X,Y coordinates of keypoints
 
 while True:
    # Catch frame
@@ -45,31 +61,31 @@ while True:
    if ret == False:
       break
 
+   FrameNumber = FrameNumber + 1
+
+   img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+   # Find descriptors and keypoints
+   kp1, des1 = orb.detectAndCompute(img, None)
+   des1 = np.float32(des1)  # change format
+
    # First frame
-   if FrameNumber == 0:
-      FrameNumber = FrameNumber + 1
+   if FrameNumber == 1:
 
-      img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-      # Find descriptors and keypoints in first frame
-      kp, des = orb.detectAndCompute(img, None)
-      des = np.float32(des)  # change format
-
-      num =[]
-      for p in range(0, len(kp)):
-            num.append(p + 1)
+      kp = kp1
+      des = des1
 
       # Draw keypoints
-      font = cv2.FONT_HERSHEY_SIMPLEX  # font for draw numbers keypoints
-      img = cv2.drawKeypoints(img, kp, None, color=(0, 0, 255), flags=0)
+      img1 = cv2.drawKeypoints(img, kp, None, color=(0, 0, 255), flags=0)
+      num = []
 
       # Draw number of keypoints
       for p in range(0, len(kp)):
-         cv2.putText(img, '{}'.format(num[p]), (int(kp[p].pt[0]), int(kp[p].pt[1])), font, 0.5, (0, 0, 255), 1,
+         num.append(p + 1)
+         cv2.putText(img1, '{}'.format(num[p]), (int(kp[p].pt[0]), int(kp[p].pt[1])), font, 0.5, (0, 0, 255), 1,
                      cv2.LINE_AA)
       # Show result
-      cv2.imshow("First", img)
-      # plt.imshow(img), plt.title('Detected keypoints')
+      cv2.imshow("First", img1)
+      # plt.imshow(img1), plt.title('Detected keypoints')
       # while not plt.waitforbuttonpress(): pass
 
 
@@ -84,30 +100,29 @@ while True:
 
    # Second and following frames
    else:
-      FrameNumber = FrameNumber + 1
+      # Condition for pass all operations and go to next iteration cycle if less two keypoints are found (because in "knnMatch" k=2 below)
+      if len(kp1) < 2:
 
-      img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+         # Draw keypoints
+         img = cv2.drawKeypoints(img, kp1, None, color=(0, 0, 255), flags=0)  # trainImage
 
-      # Find descriptors and keypoints in second frame / train image
-      kp1, des1 = orb.detectAndCompute(img, None)
-      des1 = np.float32(des1)  # change format
+         # Show result
+         cv2.imshow("Detected keypoints", img)
+         cv2.waitKey(1)
 
-      # Draw keypoints
-      font = cv2.FONT_HERSHEY_SIMPLEX  # font for draw numbers keypoints
-      img1 = cv2.drawKeypoints(img, kp1, None, color=(0, 0, 255), flags=0)
+         # FLANN doesn't work if less two keypoints are found. Therefore there are not keyponts to save
+         kp = []
+         num = []
 
-      # Draw number of keypoints
-      for p in range(0, len(kp1)):
-         cv2.putText(img1, '{}'.format(p+1), (int(kp1[p].pt[0]), int(kp1[p].pt[1])), font, 0.5, (0, 0, 255), 1,
-                     cv2.LINE_AA)
-      # Show result
-      cv2.imshow("kp", img1)
-      # plt.imshow(img1), plt.title('Detected keypoints')
-      # while not plt.waitforbuttonpress(): pass
-
+         # Store numbers and X,Y coordinates of keypoints (for matlab)
+         NumXY = pickle_X_Y_coordinates_and_numbers(kp, num)
+         NumXY_frame.append(NumXY)
+         
+         continue
 
       # Match 'new' keypoints with 'old'
       matches = flann.knnMatch(des, des1, k=2)
+      # matches = sorted(matches, key=lambda x: x[0].distance)
 
       # matches - del_kp1 = the worst matches (it is new keypoints)
       del_kp1 = []
@@ -116,7 +131,7 @@ while True:
 
       # Find only good matches
       good_matches = []
-      new_keypoints = []
+
       for m, n in matches:
          if m.distance < 0.55 * n.distance:
             good_matches.append(m)
@@ -132,43 +147,16 @@ while True:
       kp.extend(kp1)
       num.extend(np.arange(des.shape[0]+1, des.shape[0]+1+len(kp1)))
       des1 = np.delete(des1, del_kp1, axis=0)
-      print(des1.shape[0])
       des = np.append(des, des1, axis=0)
-      print(des.shape[0])
 
-
-      # kp_new = []
-      # num_new = []
-      # des_new = []
-      # for m in new_keypoints:
-      #    kp_new.append(kp1[m.trainIdx])
-      #    des_new.append(des1[m.trainIdx])
-         # num_new.append(m.queryIdx + 1)
-      # print(des1)
-      # print(des_new)
-      #
-      # print(num)
-
-      # print(np.arange(des.shape[0] + 1, des.shape[0] + 1 + len(kp_new)))
-      # num_new = np.arange(des.shape[0] + 1, des.shape[0] + 1 + len(kp_new))
-      # print(num_new)
-
-      # kp.extend(kp_new)
-      # num.extend(num_new)
-
-      # if len(kp_new) != 0:
-      #    des = np.append(des, des_new, axis=0)
-
-
-      # For save
-      kp
-      num
-
+      # print(len(good_matches))
+      # print(des1.shape[0])
+      # print(des.shape[0])
 
    # Draw keypoints
-   font = cv2.FONT_HERSHEY_SIMPLEX  # font for draw numbers keypoints
    img = cv2.drawKeypoints(img, kp, None, color=(0, 0, 255), flags=0)
    # Draw number of keypoints
+
    for p in range(0, len(kp)):
       cv2.putText(img, '{}'.format(num[p]), (int(kp[p].pt[0]), int(kp[p].pt[1])), font, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
 
@@ -177,11 +165,23 @@ while True:
    # plt.imshow(img), plt.title('Detected keypoints')
    # while not plt.waitforbuttonpress(): pass
 
+   # Store numbers and X,Y coordinates of keypoints (for matlab)
+   NumXY = pickle_X_Y_coordinates_and_numbers(kp, num)
+   NumXY_frame.append(NumXY)
+   print(len(NumXY_frame))
+   print(FrameNumber)
+
    # delay used to frame change
-   key = cv2.waitKey(0)
+   key = cv2.waitKey(1)
    # exit if user press 'esc'
    if key == 27:
       break
+
+
+
+# Save for matlab
+import scipy.io
+scipy.io.savemat('keypoints_numbers_database2.mat', mdict={'NumXY_frame': NumXY_frame})
 
 cap.release()
 cv2.destroyAllWindows
