@@ -26,7 +26,7 @@ for i = 1:Options.N_MODEL
     Number_Z = size(NumXY, 1)           % amount of keypoints on current frame
     
     if Number_Z ~= 0
-        [Point_estim] = Point_estim_init_secondary(NumXY, Number_Z, Point_estim);
+        [Point_estim] = Point_estim_init_current(NumXY, Number_Z, Point_estim);
 
         %% Observation vector
         clear Y2
@@ -42,15 +42,15 @@ for i = 1:Options.N_MODEL
         
         %% Save estimation X3 and Dx3
         Point_estim.filter.x3_xcam = Point_estim.filter.x3(1:3);
-        Point_estim.filter.x3_qcam = Point_estim.filter.x3(4:7)
+        Point_estim.filter.x3_qcam = Point_estim.filter.x3(4:7);
         
         diagDx3 = diag(Point_estim.filter.Dx3);
         Point_estim.filter.initial_uncertainty_dispersion_x3_xcam = diagDx3(1:3);
         Point_estim.filter.initial_uncertainty_dispersion_x3_qcam = diagDx3(4:7);
         
         for j = 1:Number_Z
-            Point_estim.filter.x3_xn_all(3*NumXY(j,3):3*NumXY(j,3)+2) = Point_estim.filter.x3(7+3*j-2:7+3*j);
-            Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all(3*NumXY(j,3):3*NumXY(j,3)+2) = diagDx3(7+3*j-2:7+3*j);
+            Point_estim.filter.x3_xn_all(3*NumXY(j,3)-2:3*NumXY(j,3)) = Point_estim.filter.x3(7+3*j-2:7+3*j);
+            Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all(3*NumXY(j,3)-2:3*NumXY(j,3)) = diagDx3(7+3*j-2:7+3*j);
         end
         
     else

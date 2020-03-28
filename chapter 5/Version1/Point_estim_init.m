@@ -10,8 +10,8 @@ Point_estim.camera.koef_pixel2meters = (Point_estim.camera.L./Point_estim.camera
 
 %% FILTER INIT
 Point_estim.filter.sko_pixels = 3;          % rms observations noise in pixels
-Point_estim.filter.dispersion_Frame_Meas_X = (Point_estim.filter.sko_pixels*Point_estim.camera.L(1)/Point_estim.camera.cam_res(1))^2;   % rms observations noise X on frame
-Point_estim.filter.dispersion_Frame_Meas_Y = (Point_estim.filter.sko_pixels*Point_estim.camera.L(2)/Point_estim.camera.cam_res(2))^2;   % rms observations noise Y on frame
+Point_estim.filter.dispersion_Frame_Meas_X = (Point_estim.filter.sko_pixels*Point_estim.camera.koef_pixel2meters(1))^2;   % rms observations noise X on frame
+Point_estim.filter.dispersion_Frame_Meas_Y = (Point_estim.filter.sko_pixels*Point_estim.camera.koef_pixel2meters(2))^2;   % rms observations noise Y on frame
 
 % rms noise observation on frame if 1 keypoints on frame
 Point_estim.filter.dispersion_Frame_Meas = [Point_estim.filter.dispersion_Frame_Meas_X;
