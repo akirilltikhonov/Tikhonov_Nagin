@@ -1,0 +1,44 @@
+function [Point_estim] = Point_estim_init_current(NumXY, Number_Z, Point_estim)
+
+%% FILTER INIT CURRENT                                  Point_estim.filter.sko_Frame_Meas_Y];  
+for i = 1:Number_Z
+    %% Vector dispersion Frame Measurement for diagonal Dn3
+    dispersion_Frame_Meas(2*i-1:2*i, 1) = [Point_estim.filter.dispersion_Frame_Meas];
+    
+    %% Starting\state vector keypoints coordinates x3_xn and diagonal matrix initial uncertancy Dx3_xn
+    % Initialization x3n and diagonal Dx3_xnfor new keypoints
+    if NumXY(i,3) > length(Point_estim.filter.x3_xn_all)/3
+       Point_estim.filter.x3_xn_all(3*NumXY(i,3)-2:3*NumXY(i,3)) = [(Point_estim.filter.Xn3/Point_estim.camera.Cam_F)*[NumXY(i,1); NumXY(i,2)].*Point_estim.camera.koef_pixel2meters; Point_estim.filter.Xn3]; 
+       Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all(3*NumXY(i,3)-2:3*NumXY(i,3)) = [Point_estim.filter.sko_pixels*Point_estim.camera.koef_pixel2meters; Point_estim.filter.Gxn].^2;    
+    end
+    
+    % Current frame x3_xn
+    x3_xn(3*i-2:3*i,1) = Point_estim.filter.x3_xn_all(3*NumXY(i,3)-2:3*NumXY(i,3));
+    % Diagonal for current matrix initial uncertancy Dx3_xn
+    initial_uncertainty_dispersion_x3_xn(3*i-2:3*i,1) = Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all(3*NumXY(i,3)-2:3*NumXY(i,3));
+end
+
+%% Dn3 Variance matrix of observations on a two-dimensional (camera) image
+Point_estim.filter.Dn3 = diag((dispersion_Frame_Meas)');
+
+%% X3_0 Starting\state vector
+Point_estim.filter.x3 = [Point_estim.filter.x3_xcam; 
+                         Point_estim.filter.x3_qcam;
+                         x3_xn];
+                     
+%% Dx3 variance matrix of the estimation vector state
+Point_estim.filter.Dx3 = diag([
+    Point_estim.filter.initial_uncertainty_dispersion_x3_xcam;
+    Point_estim.filter.initial_uncertainty_dispersion_x3_qcam;
+    initial_uncertainty_dispersion_x3_xn
+                                ]');
+
+%% Dksi3
+% Dksi3 Noise variance matrix of dinamic state vector
+Point_estim.filter.Dksi_x3 = diag([
+Point_estim.filter.ksi_x3_xcam_dispersion;
+Point_estim.filter.ksi_x3_qcam_dispersion;
+Point_estim.filter.ksi_x3_xn_dispersion*ones(3*Number_Z,1)
+                                    ]');
+
+return
