@@ -10,20 +10,30 @@ close all
 clc
 
 addpath('Additionally');
-load('keypoints_numbers_database2.mat')      % load keypoints on each frame
+
+%% load keypoints on each frame
+
+% load('Mi5S\no_motion_and_rotation.mat')
+load('Mi5S\only_roll_rotation_no_motion.mat')    
+% load('Mi5S\only_pitch_rotation_no_motion.mat')      
+% load('Mi5S\only_yaw_rotation_no_motion.mat')     
+% load('Mi5S\motion_X_and_no_rotation.mat')      
+% load('Mi5S\motion_Y_and_no_rotation.mat')
+% load('Mi5S\motion_Z_and_no_rotation.mat')
 
 %% MAIN OPTIONS
 Options.N_MODEL = length(NumXY_frame);      % amount of frames
-Options.F_frame = 29.26;                    % frames per second
+Options.F_frame = 30;                    % frames per second
 Options.T = 1/Options.F_frame;              % frame duration
 Options.MODEL_TIME_SEC = Options.N_MODEL/Options.F_frame; % observation (video) time
 
-[Point_estim] = Point_estim_init();
+param = 2;                              % 1 - Nokia, 2 - Mi5S
+[Point_estim] = Point_estim_init(param, Options);    
 
 for i = 1:Options.N_MODEL
 
     NumXY = NumXY_frame{1, i};          % numbers and X,Y pixel coordinates of keypoints
-    Number_Z = size(NumXY, 1)           % amount of keypoints on current frame
+    Number_Z = size(NumXY, 1);           % amount of keypoints on current frame
     
     if Number_Z ~= 0
         [Point_estim] = Point_estim_init_current(NumXY, Number_Z, Point_estim);

@@ -10,18 +10,30 @@ close all
 clc
 
 addpath('Additionally');
-load('keypoints_numbers_database2.mat')      % load keypoints on each frame
+
+%% load keypoints on each frame
+
+% load('Mi5S\no_motion_and_rotation.mat')
+load('Mi5S\only_roll_rotation_no_motion.mat')      
+% load('Mi5S\only_pitch_rotation_no_motion.mat')     
+% load('Mi5S\only_yaw_rotation_no_motion.mat')       
+% load('Mi5S\motion_X_and_no_rotation.mat')          
+% load('Mi5S\motion_Y_and_no_rotation.mat')          
+% load('Mi5S\motion_Z_and_no_rotation.mat')
+
 
 %% MAIN OPTIONS
 Options.N_MODEL = length(NumXY_frame);      % amount of frames
-Options.F_frame = 29.26;                    % frames per second
+Options.F_frame = 30;                    % frames p\er second
 Options.T = 1/Options.F_frame;              % frame duration
 Options.MODEL_TIME_SEC = Options.N_MODEL/Options.F_frame; % observation (video) time
 
 
 FirstNumber_Z = size(NumXY_frame{1, 1}, 1);     % amount keypoints in first frame
 FirstNumXY = NumXY_frame{1, 1};                 % keypoints coordinates X,Y and their number in first frame
-[Point_estim] = Point_estim_init(FirstNumber_Z, FirstNumXY);     % initialization
+
+param = 2;      % 1 - Nokia, 2 - Mi5S
+[Point_estim] = Point_estim_init(FirstNumber_Z, FirstNumXY, param, Options);     % initialization
 
 for i = 1:Options.N_MODEL
 
@@ -56,31 +68,31 @@ for i = 1:Options.N_MODEL
             Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all(3*NumXY(j,3)-2:3*NumXY(j,3)) = diagDx3(7+3*j-2:7+3*j);
         end
         
-        %% Increase Dx3 for keypoints coordinates which aren't detected
-        NumNoDetKP = setdiff((1:size(Point_estim.filter.x3_xn_all, 1)/3)', NumXY(:, 3));
-        for j = 1:size(NumNoDetKP, 1)
-            Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all(3*NumNoDetKP(j)-2:3*NumNoDetKP(j), 1) = Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all(3*NumNoDetKP(j)-2:3*NumNoDetKP(j), 1) + ones(3, 1)*Point_estim.filter.ksi_x3_xn_dispersion;
-        end
+%         %% Increase Dx3 for keypoints coordinates which aren't detected
+%         NumNoDetKP = setdiff((1:size(Point_estim.filter.x3_xn_all, 1)/3)', NumXY(:, 3));
+%         for j = 1:size(NumNoDetKP, 1)
+%             Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all(3*NumNoDetKP(j)-2:3*NumNoDetKP(j), 1) = Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all(3*NumNoDetKP(j)-2:3*NumNoDetKP(j), 1) + ones(3, 1)*Point_estim.filter.ksi_x3_xn_dispersion;
+%         end
 
     else
         %% if no one keypoints -> only extrapolation stage
         Point_estim.filter.initial_uncertainty_dispersion_x3_xcam = Point_estim.filter.initial_uncertainty_dispersion_x3_xcam + Point_estim.filter.ksi_x3_xcam_dispersion;
         Point_estim.filter.initial_uncertainty_dispersion_x3_qcam = Point_estim.filter.initial_uncertainty_dispersion_x3_qcam + Point_estim.filter.ksi_x3_qcam_dispersion;
         
-        Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all = Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all + ones(size(Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all, 1), 1)*Point_estim.filter.ksi_x3_xn_dispersion;
+%         Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all = Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all + ones(size(Point_estim.filter.initial_uncertainty_dispersion_x3_xn_all, 1), 1)*Point_estim.filter.ksi_x3_xn_dispersion;
     end
 
     Xcam(1:3, i) = Point_estim.filter.x3_xcam;
     normQcam (1, i) = norm(Point_estim.filter.x3_qcam);
     RPY(1:3, i) = rad2deg(q2rpy(Point_estim.filter.x3_qcam));
     Npoints(1, i) = Number_Z;
-    X1(1:3, i) = Point_estim.filter.x3_xn_all(1:3, 1);
-    if length(Point_estim.filter.x3_xn_all) >= 399*3;
-        X399(1:3, i) = Point_estim.filter.x3_xn_all(399*3-2:399*3, 1);
-    end
-    if length(Point_estim.filter.x3_xn_all) >= 618*3;
-        X618(1:3, i) = Point_estim.filter.x3_xn_all(618*3-2:618*3, 1);
-    end    
+%     X1(1:3, i) = Point_estim.filter.x3_xn_all(1:3, 1);
+%     if length(Point_estim.filter.x3_xn_all) >= 399*3;
+%         X399(1:3, i) = Point_estim.filter.x3_xn_all(399*3-2:399*3, 1);
+%     end
+%     if length(Point_estim.filter.x3_xn_all) >= 618*3;
+%         X618(1:3, i) = Point_estim.filter.x3_xn_all(618*3-2:618*3, 1);
+%     end    
 end
 
 %%
