@@ -14,17 +14,20 @@ addpath('Additionally');
 %% load keypoints on each frame
 
 % load('Mi5S\no_motion_and_rotation.mat')
-load('Mi5S\only_roll_rotation_no_motion.mat')      
-% load('Mi5S\only_pitch_rotation_no_motion.mat')     
-% load('Mi5S\only_yaw_rotation_no_motion.mat')       
+
+% load('Mi5S\only_roll_rotation_no_motion.mat')
+load('Mi5S\only_roll_rotation_no_motion2.mat')
+
+% load('Mi5S\only_pitch_rotation_no_motion.mat')
+% load('Mi5S\only_yaw_rotation_no_motion.mat')
+
 % load('Mi5S\motion_X_and_no_rotation.mat')          
 % load('Mi5S\motion_Y_and_no_rotation.mat')          
 % load('Mi5S\motion_Z_and_no_rotation.mat')
 
-
 %% MAIN OPTIONS
 Options.N_MODEL = length(NumXY_frame);      % amount of frames
-Options.F_frame = 30;                    % frames p\er second
+Options.F_frame = 30;                    % frames per second
 Options.T = 1/Options.F_frame;              % frame duration
 Options.MODEL_TIME_SEC = Options.N_MODEL/Options.F_frame; % observation (video) time
 
@@ -86,13 +89,16 @@ for i = 1:Options.N_MODEL
     normQcam (1, i) = norm(Point_estim.filter.x3_qcam);
     RPY(1:3, i) = rad2deg(q2rpy(Point_estim.filter.x3_qcam));
     Npoints(1, i) = Number_Z;
-%     X1(1:3, i) = Point_estim.filter.x3_xn_all(1:3, 1);
-%     if length(Point_estim.filter.x3_xn_all) >= 399*3;
-%         X399(1:3, i) = Point_estim.filter.x3_xn_all(399*3-2:399*3, 1);
-%     end
-%     if length(Point_estim.filter.x3_xn_all) >= 618*3;
-%         X618(1:3, i) = Point_estim.filter.x3_xn_all(618*3-2:618*3, 1);
-%     end    
+    X13(1:3, i) = Point_estim.filter.x3_xn_all(13*3-2:13*3, 1);
+    if length(Point_estim.filter.x3_xn_all) >= 104*3;
+        X104(1:3, i) = Point_estim.filter.x3_xn_all(104*3-2:104*3, 1);
+    end
+    if length(Point_estim.filter.x3_xn_all) >= 189*3;
+        X189(1:3, i) = Point_estim.filter.x3_xn_all(189*3-2:189*3, 1);
+    end
+    if length(Point_estim.filter.x3_xn_all) >= 479*3;
+        X479(1:3, i) = Point_estim.filter.x3_xn_all(479*3-2:479*3, 1);
+    end  
 end
 
 %%
