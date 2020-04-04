@@ -13,13 +13,15 @@ addpath('Additionally');
 
 %% load keypoints on each frame
 
-% load('Mi5S\no_motion_and_rotation.mat')
-load('Mi5S\only_roll_rotation_no_motion.mat')    
-% load('Mi5S\only_pitch_rotation_no_motion.mat')      
-% load('Mi5S\only_yaw_rotation_no_motion.mat')     
-% load('Mi5S\motion_X_and_no_rotation.mat')      
-% load('Mi5S\motion_Y_and_no_rotation.mat')
-% load('Mi5S\motion_Z_and_no_rotation.mat')
+% load('Mi5S\no_motion_and_rotation.mat')                   %\Detectors\ORB and Flann\source\Mi5S\VID1.1
+
+load('Mi5S\only_roll_rotation_no_motion.mat')               % (мало особых точек) VID1.2 повороты камеры: центр-верх-центр-низ-центр 
+% load('Mi5S\only_pitch_rotation_no_motion.mat')            % VID1.3 центр-влево-центр-вправо-центр
+% load('Mi5S\only_yaw_rotation_no_motion.mat')              % VID1.4 центр-Yaw+-центр-Yaw--центр
+
+% load('Mi5S\motion_X_and_no_rotation.mat')                 % VID1.5 только движение камеры          
+% load('Mi5S\motion_Y_and_no_rotation.mat')                 % VID1.6          
+% load('Mi5S\motion_Z_and_no_rotation.mat')                 % VID1.7
 
 %% MAIN OPTIONS
 Options.N_MODEL = length(NumXY_frame);      % amount of frames
